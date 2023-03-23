@@ -1,43 +1,25 @@
-from tkinter import Tk, Button, Frame, StringVar
 from tkinter import *
-from tkinter.ttk import Combobox, Label
-from auto_court_orders import Database
+from tkinter import ttk
 
 root = Tk()
-root.title("Формирование судебного приказа в мировой суд") #THE DISPLAYED NAME OF THE PROGRAM
-root.geometry("400x600") #SIZE PROGRAM
+root.title("METANIT.COM")
+root.geometry("250x200")
 
-#DEBTOR'S HOUSE NUMBER SELECTION FUNCTION
-#OPENS AFTER SELECTING THE DEBTOR'S ADDRESS
-def SELECT_HOUSE_NUMBER(event):
-    VALUE = TYPE_LIST_OF_HOUSE.get()
-    NUMBER_LIST_OF_HOUSE.set(Database.RESIDENTIAL_FUND[VALUE][0])
-    BOX_NUMBER.config(values=Database.RESIDENTIAL_FUND[VALUE])
+#FUNCTION OF DISPLAYING THE MANAGEMENT COMPANY TO WHICH THE SELECTED HOUSE BELONS
+def RESPONSIBLE_MANAGEMENT_COMPANY(event):
+    # получаем выделенный элемент
+    selection = # НЕОБХОДИМО ПРОПИСАТЬ ЗАВИСИМОСТЬ ВЫБОРА УПРАВЛЯЮЩЕЙ КОМПАНИИ
+    label["text"] = f"вы выбрали: {selection}"
 
-#SELECT THE DEBTOR'S ADDRESS
-#TEXT PART
-LABEL_SELECT_DEBTOR = Label(text="Выберете адрес должника", font=("Arial", 10))
-LABEL_SELECT_DEBTOR.pack(anchor=NW, padx=6, pady=8)
 
-LIST_OF_HOUSES = list(Database.RESIDENTIAL_FUND.keys())
+languages = ["Python", "C#", "Java", "JavaScript"]
+label = ttk.Label()
+label.pack(anchor=NW, fill=X, padx=5, pady=5)
 
-#WINDOW PART
-TYPE_LIST_OF_HOUSE = StringVar()
-TYPE_LIST_OF_HOUSE.set(LIST_OF_HOUSES[0])
-BOX_HOUSE = Combobox(values=list(Database.RESIDENTIAL_FUND.keys()), textvariable=TYPE_LIST_OF_HOUSE)
-BOX_HOUSE.pack(anchor=NW, padx=6, pady=8)
-BOX_HOUSE.bind('<<ComboboxSelected>>', SELECT_HOUSE_NUMBER)
-
-#SELECT THE DEBTOR'S NUMBER HOUSE
-#TEXT PART
-LABEL_SELECT_NUMBER_HOUSE = Label(text="Укажите номер дома", font=("Arial", 10))
-LABEL_SELECT_NUMBER_HOUSE.pack(anchor=NW, padx=6, pady=12)
-
-#TWO PART
-NUMBER_LIST_OF_HOUSE = StringVar()
-NUMBER_LIST_OF_HOUSE.set(Database.RESIDENTIAL_FUND[LIST_OF_HOUSES[0]][0])
-BOX_NUMBER = Combobox(values=Database.RESIDENTIAL_FUND[LIST_OF_HOUSES[0]], textvariable=NUMBER_LIST_OF_HOUSE)
-BOX_NUMBER.pack(anchor=NW, padx=6, pady=20)
-
+combobox = ttk.Combobox(values=languages, state="readonly")
+combobox.pack(anchor=NW, fill=X, padx=5, pady=5)
+combobox.bind("<<ComboboxSelected>>", RESPONSIBLE_MANAGEMENT_COMPANY)
 
 root.mainloop()
+
+
