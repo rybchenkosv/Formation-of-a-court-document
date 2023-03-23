@@ -23,6 +23,9 @@ root.geometry("400x600") #SIZE PROGRAM
 
 #DEBTOR'S HOUSE NUMBER SELECTION FUNCTION
 #OPENS AFTER SELECTING THE DEBTOR'S ADDRESS
+def clear_combobox():
+  BOX_NUMBER_HOUSE.pack_forget()
+
 def SELECT_HOUSE_NUMBER(number):
     SELECTED_HOUSE = BOX_HOUSE.get()
 
@@ -31,9 +34,12 @@ def SELECT_HOUSE_NUMBER(number):
     LABEL_SELECT_NUMBER_HOUSE.pack(anchor=NW, padx=6, pady=12)
 
     #WINDOW PART
-    LIST_OF_NUMBER_HOUSE = [i for i in OOO_CKY_RAZVITYE[SELECTED_HOUSE]]
+    LIST_OF_NUMBER_HOUSE = [i for i in OOO_CKY_RAZVITYE[SELECTED_HOUSE]] #ПОКА ТЕСТИРУЕМ НА СКУ РАЗВИТИЕ, ПОСЛЕ НЕОБХОДИМО УКАЗАТЬ НА ПОЛНЫЙ СПИСОК ДОМОВ
     BOX_NUMBER_HOUSE = ttk.Combobox(values=LIST_OF_NUMBER_HOUSE)
     BOX_NUMBER_HOUSE.pack(anchor=NW, padx=6, pady=10)
+
+    button = Button(root, text='очистить', command=clear_combobox)
+    button.pack()
 
 #SELECT THE DEBTOR'S ADDRESS
 #TEXT PART
@@ -44,6 +50,8 @@ LABEL_SELECT_DEBTOR.pack(anchor=NW, padx=6, pady=8)
 LIST_OF_HOUSES = [i for i in OOO_CKY_RAZVITYE]
 BOX_HOUSE = ttk.Combobox(values=LIST_OF_HOUSES)
 BOX_HOUSE.pack(anchor=NW, padx=6, pady=6)
+
 BOX_HOUSE.bind("<<ComboboxSelected>>", SELECT_HOUSE_NUMBER) #TRACKING VALUE SELECTION
+
 
 root.mainloop()
