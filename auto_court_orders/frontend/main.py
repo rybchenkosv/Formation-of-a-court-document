@@ -19,6 +19,7 @@ def ASSIGNING_VALUES_TO_VARIABLES_ON_THE_RIGHT_SIDE(event):
     COMPANY_ADDRESS_LABEL["text"] = f"{Database.ADDRESS_OF_THE_CLAIMANT(VARIABLE_STREET, VARIABLE_NUMBER)}"
     JUDICIAL_SECTION_LABEL["text"] = f"{Database.COURT_NUMBER(VARIABLE_STREET, VARIABLE_NUMBER)}"
     MANAGEMENT_START_DATE_LABEL["text"] = f"{Database.MANAGEMENT_START_DATE(VARIABLE_STREET, VARIABLE_NUMBER)}"
+    AMOUNT_OF_THE_STATE_DUTY_LABEL["text"] = f"{main.AMOUNT_OF_THE_STATE_FEE(AMOUNT_OF_DEBT)}"
 
 #FUNCTION RETURNING A LIST OF NUMBERS OF THE SELECTED HOUSE
 def SELECT_HOUSE_NUMBER(event):
@@ -78,6 +79,37 @@ DEBTORS_FULL_NAME_LABEL = Entry(width=40)
 DEBTORS_FULL_NAME_LABEL.grid(row=7, column=0)
 DEBTORS_FULL_NAME = DEBTORS_FULL_NAME_LABEL.get() #ПОКА ПУСТОЕ ПРИСВАИВАНИЕ, ПОСЛЕ НЕОБХОДИМО ВНЕДРИТЬ С ПРОВЕРКОЙ!
 
+#DEBTORS DATE OF BIRTH
+#TEXT PART
+LABEL_DEBTORS_DATE_OF_BIRTH = Label(text="Укажите дату рождения должника", font=("Arial", 10))
+LABEL_DEBTORS_DATE_OF_BIRTH.grid(row=8, column=0)
+
+#FIVE WINDOW PART
+DEBTORS_DATE_OF_BIRTH_LABEL = Entry(width=15)
+DEBTORS_DATE_OF_BIRTH_LABEL.grid(row=9, column=0)
+DEBTORS_DATE_OF_BIRTH = DEBTORS_DATE_OF_BIRTH_LABEL.get() #ПОКА ПУСТОЕ ПРИСВАИВАНИЕ, ПОСЛЕ НЕОБХОДИМО ВНЕДРИТЬ С ПРОВЕРКОЙ!
+
+#DEBTORS DATE OF BIRTH
+#TEXT PART
+LABEL_PASSPORT_DATA_OF_THE_DEBTOR = Label(text="Укажите паспортные данные должника", font=("Arial", 10))
+LABEL_PASSPORT_DATA_OF_THE_DEBTOR.grid(row=10, column=0)
+
+#SIX WINDOW PART
+PASSPORT_DATA_OF_THE_DEBTOR_LABEL = Entry(width=40)
+PASSPORT_DATA_OF_THE_DEBTOR_LABEL.grid(row=11, column=0)
+PASSPORT_DATA_OF_THE_DEBTOR = PASSPORT_DATA_OF_THE_DEBTOR_LABEL.get() #ПОКА ПУСТОЕ ПРИСВАИВАНИЕ, ПОСЛЕ НЕОБХОДИМО ВНЕДРИТЬ С ПРОВЕРКОЙ!
+
+#CONFIRMATION OF REGISTRATION AND PROPERTY
+#SEVEN WINDOW PART
+PROPERTY_CONFIRMATION_STR = StringVar()
+PROPERTY_CONFIRMATION_LABEL = Checkbutton(text="Является собственником", variable=PROPERTY_CONFIRMATION_STR)
+PROPERTY_CONFIRMATION_LABEL.grid(row=12, column=0)
+PROPERTY_CONFIRMATION = PROPERTY_CONFIRMATION_STR.get() #ПОКА ПУСТОЕ ПРИСВАИВАНИЕ, ПОСЛЕ НЕОБХОДИМО ВНЕДРИТЬ С ПРОВЕРКОЙ!
+#EIGHT WINDOW PART
+REGISTRATION_CHECK_STR = StringVar()
+REGISTRATION_CHECK_LABEL = Checkbutton(text="Прописан", variable=REGISTRATION_CHECK_STR)
+REGISTRATION_CHECK_LABEL.grid(row=13, column=0)
+REGISTRATION_CHECK = REGISTRATION_CHECK_STR.get() #ПОКА ПУСТОЕ ПРИСВАИВАНИЕ, ПОСЛЕ НЕОБХОДИМО ВНЕДРИТЬ С ПРОВЕРКОЙ!
 
 
 ## BLOCKS ON THE RIGHT
@@ -114,5 +146,25 @@ LABEL_MANAGEMENT_START_DATE.grid(row=6, column=2)
 #LABEL BLOCK WITH MANAGEMENT START DATE
 MANAGEMENT_START_DATE_LABEL = Label()
 MANAGEMENT_START_DATE_LABEL.grid(row=7, column=2)
+
+#BLOCK AMOUNT OF DEBTOR'S DEBT
+LABEL_DEBTORS_DEBT = Label(text="Сумма задолженности", font=("Arial", 10))
+LABEL_DEBTORS_DEBT.grid(row=8, column=2)
+
+#LABEL AMOUNT OF DEBTOR'S DEBT
+DEBTOR_DEBT_LABEL = Entry(width=40)
+DEBTOR_DEBT_LABEL.grid(row=9, column=2)
+DEBTOR_DEBT = DEBTOR_DEBT_LABEL.get() #ПОКА ПУСТОЕ ПРИСВАИВАНИЕ, ПОСЛЕ НЕОБХОДИМО ВНЕДРИТЬ С ПРОВЕРКОЙ!
+
+#BLOCK AMOUNT OF THE STATE DUTY
+LABEL_AMOUNT_OF_THE_STATE_DUTY = Label(text="Сумма гос.пошлины", font=("Arial", 10))
+LABEL_AMOUNT_OF_THE_STATE_DUTY.grid(row=10, column=2)
+
+#LABEL AMOUNT OF THE STATE DUTY
+AMOUNT_OF_THE_STATE_DUTY_LABEL = Label()
+AMOUNT_OF_THE_STATE_DUTY_LABEL.grid(row=11, column=2)
+
+
+
 
 root.mainloop()

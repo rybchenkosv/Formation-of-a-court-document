@@ -11,11 +11,6 @@ COURT_NUMBER = ['Мировому судье судебного участка �
 DEBTORS = {i:[input('Full name of the debtor: '),input('Date of birth of the debtor: '),input('Debtors passport details: ')]
            for i in range(1, int(input('Number of debtors: ')) + 1)}
 
-AMOUNT_OF_DEBT = float(input('Enter the amount of debt: '))
-
-AMOUNT_OF_THE_STATE_FEE = round(float(200) if AMOUNT_OF_DEBT <= float(10000)
-                                else(AMOUNT_OF_DEBT / 100 * 2 if AMOUNT_OF_DEBT <= float(20001) else 400 + (AMOUNT_OF_DEBT - 20000) / 100 * 1.5), 2)
-
 TOTAL_DEBT = AMOUNT_OF_THE_STATE_FEE + AMOUNT_OF_DEBT
 
 #OPERATIONS RELATED TO REGISTERED AND RESIDENTIAL OWNERS
