@@ -1,5 +1,6 @@
 from tkinter import *
 from tkinter import ttk
+from auto_court_orders import Database
 
 root = Tk()
 root.title("METANIT.COM")
@@ -8,11 +9,11 @@ root.geometry("250x200")
 #FUNCTION OF DISPLAYING THE MANAGEMENT COMPANY TO WHICH THE SELECTED HOUSE BELONS
 def RESPONSIBLE_MANAGEMENT_COMPANY(event):
     # получаем выделенный элемент
-    selection = # НЕОБХОДИМО ПРОПИСАТЬ ЗАВИСИМОСТЬ ВЫБОРА УПРАВЛЯЮЩЕЙ КОМПАНИИ
+    selection = Database.NAME_OF_THE_CLAIMANT
     label["text"] = f"вы выбрали: {selection}"
 
 
-languages = ["Python", "C#", "Java", "JavaScript"]
+languages = Database.RESIDENTIAL_FUND
 label = ttk.Label()
 label.pack(anchor=NW, fill=X, padx=5, pady=5)
 

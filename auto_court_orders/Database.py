@@ -79,20 +79,44 @@ JUDICIAL_PRECINCT_9 = ['Белинского', 'Горького', 'Заводс
                        'Нестерова', 'Октябрьская', 'Советской Армии', 'Сурикова', 'Солнечная',
                        'Тургенева',{'Дружбы':['1', '1А', '1Б', '1Г', '19']}]
 
-JUDICIAL_PRECINCT_8 = []
+JUDICIAL_PRECINCT_8 = ['Береговая', 'Дзержинского', {'Дружбы':['96','98','100','102','104','106','108','108А','112','114','114А','116','118','120Б','124','132','136','138','142','144']},
+                       'Ленина','Парковая','Пархоменко','Советская','Центральная','Чкалова','Юбилейный','Юности']
 
 
+def NAME_OF_THE_CLAIMANT(street,number):
+    if street in OOO_CKY_RAZVITYE and number in OOO_CKY_RAZVITYE[street]:
+        return 'ООО "СКУ Развитие"'
+    elif street in OOO_BSK_PLUS and number in OOO_BSK_PLUS[street]:
+        return 'ООО "БСК Плюс"'
+    elif street in OOO_KONCEPT and number in OOO_KONCEPT[street]:
+        return 'ООО "Концепт"'
+    else:
+        return 'ОШИБКА. Управляющая компания не найдена.'
 
-#NAME_OF_THE_CLAIMANT = ['ООО "СКУ Развитие"' if ___ in OOO_CKY_RAZVITYE
-#                        else ('ООО "БСК Плюс"' if ___ in OOO_BSK_PLUS else 'ООО "Концепт"')]
+def ADDRESS_OF_THE_CLAIMANT(street,number):
+    if street in OOO_CKY_RAZVITYE and number in OOO_CKY_RAZVITYE[street]:
+        return '662520 Красноярский край, Березовский район, п. Березовка ул. Юности, пом. 2 каб. 2'
+    elif street in OOO_BSK_PLUS and number in OOO_BSK_PLUS[street]:
+        return '662520 Красноярский край, Березовский район, п. Березовка ул. Юности, д. 19/2'
+    elif street in OOO_KONCEPT and number in OOO_KONCEPT[street]:
+        return '662520 Красноярский край, Березовский район, п. Березовка ул. Юности, д. 19/2'
+    else:
+        return ''
 
-#ADDRESS_OF_THE_CLAIMANT = ['662520 Красноярский край, Березовский район, п. Березовка ул. Юности, пом. 2 каб. 2'
-#                            if ___ in OOO_CKY_RAZVITYE
-#                            else '662520 Красноярский край, Березовский район, п. Березовка ул. Юности, д. 19/2']
+def COURT_NUMBER(street,number):
+    if street in JUDICIAL_PRECINCT_9:
+        return 'Мировому судье судебного участка №9 в Березовском районе Красноярского края Пашковскому А.Д.'
+    elif street == 'Дружбы' and number in JUDICIAL_PRECINCT_9[12][street]:
+        return 'Мировому судье судебного участка №9 в Березовском районе Красноярского края Пашковскому А.Д.'
+    elif street in JUDICIAL_PRECINCT_8:
+        return 'Мировому судье судебного участка №8 в Березовском районе Красноярского края Белявцевой Е.А.'
+    elif street == 'Дружбы' and number in JUDICIAL_PRECINCT_8[2][street]:
+        return 'Мировому судье судебного участка №8 в Березовском районе Красноярского края Белявцевой Е.А.'
+    else:
+        return 'ОШИБКА! Не найден судебный участок!'
+
+
 
 #MANAGEMENT_START_DATE = ['2019' if ___ in OOO_CKY_RAZVITYE else '2020']
 
-#COURT_NUMBER = ['Мировому судье судебного участка №9 в Березовском районе Красноярского края Пашковскому А.Д.'
-#                if ADDRESS_NAME in JUDICIAL_PRECINCT_9
-#                else 'Мировому судье судебного участка №8 в Березовском районе Красноярского края Белявцевой Е.А.']
 

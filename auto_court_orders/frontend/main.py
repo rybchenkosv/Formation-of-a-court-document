@@ -5,7 +5,19 @@ from auto_court_orders import Database
 
 root = Tk()
 root.title("Формирование судебного приказа в мировой суд") #THE DISPLAYED NAME OF THE PROGRAM
-root.geometry("400x600") #SIZE PROGRAM
+root.geometry("1000x600") #SIZE PROGRAM
+
+#LOCATION CONFIGURATION
+for c in range(3): root.columnconfigure(index=c, weight=1)
+for r in range(3): root.rowconfigure(index=r, weight=0)
+
+#THIS FUNCTION IS RESPONSIBLE FOR ASSIGNING VALUES TO THE RIGHT SIDE OF THE APPLICATION
+def ASSIGNING_VALUES_TO_VARIABLES_ON_THE_RIGHT_SIDE(event):
+    VARIABLE_STREET = BOX_HOUSE.get()
+    VARIABLE_NUMBER = BOX_NUMBER.get()
+    COMPANY_NAME_LABEL["text"] = f"{Database.NAME_OF_THE_CLAIMANT(VARIABLE_STREET, VARIABLE_NUMBER)}"
+    COMPANY_ADDRESS_LABEL["text"] = f"{Database.ADDRESS_OF_THE_CLAIMANT(VARIABLE_STREET, VARIABLE_NUMBER)}"
+    JUDICIAL_SECTION_LABEL["text"] = f"{Database.COURT_NUMBER(VARIABLE_STREET, VARIABLE_NUMBER)}"
 
 #FUNCTION RETURNING A LIST OF NUMBERS OF THE SELECTED HOUSE
 def SELECT_HOUSE_NUMBER(event):
@@ -13,10 +25,14 @@ def SELECT_HOUSE_NUMBER(event):
     NUMBER_LIST_OF_HOUSE.set(Database.RESIDENTIAL_FUND[VALUE][0])
     BOX_NUMBER.config(values=Database.RESIDENTIAL_FUND[VALUE])
 
+
+## BLOCKS ON THE LEFT
+## SIDE OF THE APPLICATION
+
 #SELECT THE DEBTOR'S ADDRESS
 #TEXT PART
 LABEL_SELECT_DEBTOR = Label(text="Выберете адрес должника", font=("Arial", 10))
-LABEL_SELECT_DEBTOR.pack(anchor=NW, padx=2, pady=2)
+LABEL_SELECT_DEBTOR.grid(row=0, column=0)
 
 LIST_OF_HOUSES = list(Database.RESIDENTIAL_FUND.keys())
 
@@ -24,19 +40,47 @@ LIST_OF_HOUSES = list(Database.RESIDENTIAL_FUND.keys())
 TYPE_LIST_OF_HOUSE = StringVar()
 TYPE_LIST_OF_HOUSE.set(LIST_OF_HOUSES[0])
 BOX_HOUSE = Combobox(values=list(Database.RESIDENTIAL_FUND.keys()), textvariable=TYPE_LIST_OF_HOUSE)
-BOX_HOUSE.pack(anchor=NW, padx=2, pady=2)
+BOX_HOUSE.grid(row=1, column=0)
 BOX_HOUSE.bind('<<ComboboxSelected>>', SELECT_HOUSE_NUMBER)
 
 #SELECT THE DEBTOR'S NUMBER HOUSE
 #TEXT PART
 LABEL_SELECT_NUMBER_HOUSE = Label(text="Укажите номер дома", font=("Arial", 10))
-LABEL_SELECT_NUMBER_HOUSE.pack(anchor=NW, padx=2, pady=2)
+LABEL_SELECT_NUMBER_HOUSE.grid(row=2, column=0)
 
 #TWO WINDOW PART
 NUMBER_LIST_OF_HOUSE = StringVar()
 NUMBER_LIST_OF_HOUSE.set(Database.RESIDENTIAL_FUND[LIST_OF_HOUSES[0]][0])
 BOX_NUMBER = Combobox(values=Database.RESIDENTIAL_FUND[LIST_OF_HOUSES[0]], textvariable=NUMBER_LIST_OF_HOUSE)
-BOX_NUMBER.pack(anchor=NW, padx=2, pady=2)
+BOX_NUMBER.grid(row=3, column=0)
+BOX_NUMBER.bind('<<ComboboxSelected>>', ASSIGNING_VALUES_TO_VARIABLES_ON_THE_RIGHT_SIDE)
 
+
+## BLOCKS ON THE RIGHT
+## SIDE OF THE APPLICATION
+
+#BLOCK FOR SPECIFYING THE COMPANY NAME
+LABEL_COMPANY_INFORMATION = Label(text="Управляющая компания", font=("Arial", 10))
+LABEL_COMPANY_INFORMATION.grid(row=0, column=2)
+
+#COMPANY NAME LABEL BLOCK
+COMPANY_NAME_LABEL = Label()
+COMPANY_NAME_LABEL.grid(row=1, column=2)
+
+#BLOCK FOR SPECIFYING THE COMPANY'S ADDRESS
+LABEL_COMPANY_INFORMATION = Label(text="Адрес управляющей компании", font=("Arial", 10))
+LABEL_COMPANY_INFORMATION.grid(row=2, column=2)
+
+#COMPANY ADDRESS LABEL BLOCK
+COMPANY_ADDRESS_LABEL = Label()
+COMPANY_ADDRESS_LABEL.grid(row=3, column=2)
+
+#BLOCK FOR SPECIFYING THE JUDICIAL AREA
+LABEL_JUDICIAL_AREA = Label(text="Судебный участок", font=("Arial", 10))
+LABEL_JUDICIAL_AREA.grid(row=4, column=2)
+
+#LABEL BLOCK WITH JUDICIAL SECTION
+JUDICIAL_SECTION_LABEL = Label()
+JUDICIAL_SECTION_LABEL.grid(row=5, column=2)
 
 root.mainloop()
