@@ -1,69 +1,138 @@
 from tkinter import Tk, Button, Frame, StringVar
-from tkinter.ttk import Combobox
-
-
-options = {
-    'Береговая':['36','38','40','42Б','44','46'],
-    'Дружбы':['1','1А','1Б','1Г','19','96','98','100','102','104','106','108','108А','112','114','114А','116','118','120Б','124','132','136','138','142','144'],
-    'Маяковского':['7','9','19','21','23'],
-    'Мичурина':['1','1Б','2','2Б','3','4','5','6','7','8','9','11','12','13','14','16','17','18','19','20'],
-    'Парковая':['1','2А','3','6','8'],
-    'Пархоменко':['1','1А','3','3А','5','5А'],
-    'Советской Армии':['20'],
-    'Советская':['1А','40','42','43А','45','46','52','53'],
-    'Строителей':['1А','1','2А','2','3','5','6','7','9'],
-    'Сурикова':['3','5','7','8','9','10','11','12','13','14','15','24','26','28','30'],
-    'Центральная':['8Б','42','45','46','47','48','50','51','53','55','56','57','58','59','61','63','65','67'],
-    'Ленина':['12'],
-    'Солнечная':['3','6','8','10','12','18','20'],
-    'Нестерова':['12','14','16','18','20'],
-    'Тургенева':['1','2','3','6','7','8','9','10','11','12','14'],
-    'Чкалова':['19'],
-    'Октябрьская': ['4', '5', '6', '7', '8', '9', '10'],
-    'Олейникова': ['64'],
-    'Горького':['15','17'],
-    'Дзержинского':['17','38'],
-    'Калинина':['1','2','3'],
-    'Полевая':['2А','70','72'],
-    'Юбилейный': ['2', '4'],
-    'Юности': ['5'],
-    'Заводская': ['55']
-}
-
-
-def get_var_1(event):
-    value = cb1_var.get()
-    cb2_var.set(options[value][0])
-    cb2.config(values=options[value])
-
-
-def get_info():
-    print(cb1_var.get(), cb2_var.get())
-
+from tkinter import *
+from tkinter.ttk import Combobox, Label
+from auto_court_orders import Database
 
 root = Tk()
+root.title("Формирование судебного приказа в мировой суд") #THE DISPLAYED NAME OF THE PROGRAM
+root.geometry("1000x600") #SIZE PROGRAM
 
-cb_frame = Frame(root)
-cb_frame.pack(side='left')
+#LOCATION CONFIGURATION
+for c in range(3): root.columnconfigure(index=c, weight=1)
+for r in range(3): root.rowconfigure(index=r, weight=0)
 
-cb1_values = list(options.keys())
+#THIS FUNCTION IS RESPONSIBLE FOR ASSIGNING VALUES TO THE RIGHT SIDE OF THE APPLICATION
+def ASSIGNING_VALUES_TO_VARIABLES_ON_THE_RIGHT_SIDE(event):
+    VARIABLE_STREET = BOX_HOUSE.get()
+    VARIABLE_NUMBER = BOX_NUMBER.get()
+    COMPANY_NAME_LABEL["text"] = f"{Database.NAME_OF_THE_CLAIMANT(VARIABLE_STREET, VARIABLE_NUMBER)}"
+    COMPANY_ADDRESS_LABEL["text"] = f"{Database.ADDRESS_OF_THE_CLAIMANT(VARIABLE_STREET, VARIABLE_NUMBER)}"
+    JUDICIAL_SECTION_LABEL["text"] = f"{Database.COURT_NUMBER(VARIABLE_STREET, VARIABLE_NUMBER)}"
+    MANAGEMENT_START_DATE_LABEL["text"] = f"{Database.MANAGEMENT_START_DATE(VARIABLE_STREET, VARIABLE_NUMBER)}"
 
-cb1_var = StringVar()
-cb1_var.set(cb1_values[0])
-cb1 = Combobox(cb_frame, values=list(options.keys()), textvariable=cb1_var)
-cb1.pack(side='top')
-cb1.bind('<<ComboboxSelected>>', get_var_1)
+#FUNCTION RETURNING A LIST OF NUMBERS OF THE SELECTED HOUSE
+def SELECT_HOUSE_NUMBER(event):
+    VALUE = TYPE_LIST_OF_HOUSE.get()
+    NUMBER_LIST_OF_HOUSE.set(Database.RESIDENTIAL_FUND[VALUE][0])
+    BOX_NUMBER.config(values=Database.RESIDENTIAL_FUND[VALUE])
+
+#THE FUNCTION OF CHECKING THE CORRECTLY ENTERED DATE OF BIRTH
+def CHECKING_CORRECTNESS_DATE(date):
+    result = re.match("^\+{0,1}\d{0,11}$", date) is not None
+    if not result and len(date) <= 12:
+        errmsg.set("Номер телефона должен быть в формате +xxxxxxxxxxx, где x представляет цифру")
+    else:
+        errmsg.set("")
+    return result
 
 
-cb2_var = StringVar()
-cb2_var.set(options[cb1_values[0]][0])
-cb2 = Combobox(cb_frame, values=options[cb1_values[0]], textvariable=cb2_var)
-cb2.pack(side='bottom')
+## BLOCKS ON THE LEFT
+## SIDE OF THE APPLICATION
+
+#SELECT THE DEBTOR'S ADDRESS
+#TEXT PART
+LABEL_SELECT_DEBTOR = Label(text="Выберете адрес должника", font=("Arial", 10))
+LABEL_SELECT_DEBTOR.grid(row=0, column=0)
+
+LIST_OF_HOUSES = list(Database.RESIDENTIAL_FUND.keys())
+
+#ONE WINDOW PART
+TYPE_LIST_OF_HOUSE = StringVar()
+TYPE_LIST_OF_HOUSE.set(LIST_OF_HOUSES[0])
+BOX_HOUSE = Combobox(values=list(Database.RESIDENTIAL_FUND.keys()), textvariable=TYPE_LIST_OF_HOUSE)
+BOX_HOUSE.grid(row=1, column=0)
+BOX_HOUSE.bind('<<ComboboxSelected>>', SELECT_HOUSE_NUMBER)
+
+#SELECT THE DEBTOR'S NUMBER HOUSE
+#TEXT PART
+LABEL_SELECT_NUMBER_HOUSE = Label(text="Укажите номер дома", font=("Arial", 10))
+LABEL_SELECT_NUMBER_HOUSE.grid(row=2, column=0)
+
+#TWO WINDOW PART
+NUMBER_LIST_OF_HOUSE = StringVar()
+NUMBER_LIST_OF_HOUSE.set(Database.RESIDENTIAL_FUND[LIST_OF_HOUSES[0]][0])
+BOX_NUMBER = Combobox(values=Database.RESIDENTIAL_FUND[LIST_OF_HOUSES[0]], textvariable=NUMBER_LIST_OF_HOUSE)
+BOX_NUMBER.grid(row=3, column=0)
+BOX_NUMBER.bind('<<ComboboxSelected>>', ASSIGNING_VALUES_TO_VARIABLES_ON_THE_RIGHT_SIDE)
+
+#SELECT THE DEBTOR'S APARTMENT NUMBER
+#TEXT PART
+LABEL_SELECT_APARTMENT_NUMBER = Label(text="Укажите номер квартиры", font=("Arial", 10))
+LABEL_SELECT_APARTMENT_NUMBER.grid(row=4, column=0)
+
+#THREE WINDOW PART
+APARTMENT_NUMBER_LABEL = Entry(width=10)
+APARTMENT_NUMBER_LABEL.grid(row=5, column=0)
+NUMBER_APARTMENT = APARTMENT_NUMBER_LABEL.get() #ПОКА ПУСТОЕ ПРИСВАИВАНИЕ, ПОСЛЕ НЕОБХОДИМО ВНЕДРИТЬ С ПРОВЕРКОЙ!
+
+##
+## DEBTORS INDICATION BLOCK
+##
+#TEXT PART
+LABEL_DEBTORS_FULL_NAME = Label(text="Укажите ФИО должника", font=("Arial", 10))
+LABEL_DEBTORS_FULL_NAME.grid(row=6, column=0)
+
+#FOUR WINDOW PART
+DEBTORS_FULL_NAME_LABEL = Entry(width=40)
+DEBTORS_FULL_NAME_LABEL.grid(row=7, column=0)
+DEBTORS_FULL_NAME = DEBTORS_FULL_NAME_LABEL.get() #ПОКА ПУСТОЕ ПРИСВАИВАНИЕ, ПОСЛЕ НЕОБХОДИМО ВНЕДРИТЬ С ПРОВЕРКОЙ!
+
+#TEXT PART
+LABEL_DEBTORS_DATE_OF_BIRTH = Label(text="Укажите дату рождения должника", font=("Arial", 10))
+LABEL_DEBTORS_DATE_OF_BIRTH.grid(row=8, column=0)
+
+#FIVE WINDOW PART
+CHECKING_THE_CORRECTNESS_OF_THE_DATE = (root.register(CHECKING_CORRECTNESS_DATE), "%P")
+DEBTORS_DATE_OF_BIRTH_LABEL = Entry(width=20, validate="key", validatecommand=CHECKING_THE_CORRECTNESS_OF_THE_DATE)
+DEBTORS_DATE_OF_BIRTH_LABEL.grid(row=9, column=0)
+DEBTORS_DATE_OF_BIRTH = DEBTORS_DATE_OF_BIRTH_LABEL.get() #ПОКА ПУСТОЕ ПРИСВАИВАНИЕ, ПОСЛЕ НЕОБХОДИМО ВНЕДРИТЬ С ПРОВЕРКОЙ!
 
 
-btn_frame = Frame(root)
-btn_frame.pack(side='right')
-Button(btn_frame, text='Confirm', command=get_info).pack()
 
+
+## BLOCKS ON THE RIGHT
+## SIDE OF THE APPLICATION
+
+#BLOCK FOR SPECIFYING THE COMPANY NAME
+LABEL_COMPANY_INFORMATION = Label(text="Управляющая компания", font=("Arial", 10))
+LABEL_COMPANY_INFORMATION.grid(row=0, column=2)
+
+#COMPANY NAME LABEL BLOCK
+COMPANY_NAME_LABEL = Label()
+COMPANY_NAME_LABEL.grid(row=1, column=2)
+
+#BLOCK FOR SPECIFYING THE COMPANY'S ADDRESS
+LABEL_COMPANY_INFORMATION = Label(text="Адрес управляющей компании", font=("Arial", 10))
+LABEL_COMPANY_INFORMATION.grid(row=2, column=2)
+
+#COMPANY ADDRESS LABEL BLOCK
+COMPANY_ADDRESS_LABEL = Label()
+COMPANY_ADDRESS_LABEL.grid(row=3, column=2)
+
+#BLOCK FOR SPECIFYING THE JUDICIAL AREA
+LABEL_JUDICIAL_AREA = Label(text="Судебный участок", font=("Arial", 10))
+LABEL_JUDICIAL_AREA.grid(row=4, column=2)
+
+#LABEL BLOCK WITH JUDICIAL SECTION
+JUDICIAL_SECTION_LABEL = Label()
+JUDICIAL_SECTION_LABEL.grid(row=5, column=2)
+
+#BLOCK FOR MANAGEMENT START DATE
+LABEL_MANAGEMENT_START_DATE = Label(text="Дата начала управления МКД", font=("Arial", 10))
+LABEL_MANAGEMENT_START_DATE.grid(row=6, column=2)
+
+#LABEL BLOCK WITH MANAGEMENT START DATE
+MANAGEMENT_START_DATE_LABEL = Label()
+MANAGEMENT_START_DATE_LABEL.grid(row=7, column=2)
 
 root.mainloop()

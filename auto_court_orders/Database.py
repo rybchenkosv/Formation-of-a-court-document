@@ -80,7 +80,7 @@ JUDICIAL_PRECINCT_9 = ['Белинского', 'Горького', 'Заводс
                        'Тургенева',{'Дружбы':['1', '1А', '1Б', '1Г', '19']}]
 
 JUDICIAL_PRECINCT_8 = ['Береговая', 'Дзержинского', {'Дружбы':['96','98','100','102','104','106','108','108А','112','114','114А','116','118','120Б','124','132','136','138','142','144']},
-                       'Ленина','Парковая','Пархоменко','Советская','Центральная','Чкалова','Юбилейный','Юности']
+                       'Ленина','Парковая','Строителей','Пархоменко','Советская','Центральная','Чкалова','Юбилейный','Юности']
 
 
 def NAME_OF_THE_CLAIMANT(street,number):
@@ -116,7 +116,15 @@ def COURT_NUMBER(street,number):
         return 'ОШИБКА! Не найден судебный участок!'
 
 
+def MANAGEMENT_START_DATE(street,number):
+    if street in OOO_CKY_RAZVITYE and number in OOO_CKY_RAZVITYE[street]:
+        return '2019 года'
+    elif street in OOO_BSK_PLUS and number in OOO_BSK_PLUS[street]:
+        return '2020 года'
+    elif street in OOO_KONCEPT and number in OOO_KONCEPT[street]:
+        return '2020 года '
+    else:
+        return 'ОШИБКА! Невозможно найти дату начала управления!'
 
-#MANAGEMENT_START_DATE = ['2019' if ___ in OOO_CKY_RAZVITYE else '2020']
 
 

@@ -1,24 +1,29 @@
-JUDICIAL_PRECINCT_9 = ['Белинского', 'Горького', 'Заводская', 'Калинина', 'Маяковского', 'Мичурина',
-                       'Нестерова', 'Октябрьская', 'Советской Армии', 'Сурикова', 'Солнечная',
-                       'Тургенева',{'Дружбы':['1', '1А', '1Б', '1Г', '19']}]
+from tkinter import *
+from tkinter import ttk
+import re
 
-JUDICIAL_PRECINCT_8 = ['Береговая', 'Дзержинского', {'Дружбы':['96','98','100','102','104','106','108','108А','112','114','114А','116','118','120Б','124','132','136','138','142','144']},
-                       'Ленина','Парковая','Пархоменко','Советская','Центральная','Чкалова','Юбилейный','Юности']
 
-street = 'Тургенева'
-number = '456'
-
-def COURT_NUMBER(street,number):
-    if street in JUDICIAL_PRECINCT_9:
-        return 'Мировому судье судебного участка №9 в Березовском районе Красноярского края Пашковскому А.Д.'
-    elif street == 'Дружбы' and number in JUDICIAL_PRECINCT_9[12][street]:
-        return 'Мировому судье судебного участка №9 в Березовском районе Красноярского края Пашковскому А.Д.'
-    elif street in JUDICIAL_PRECINCT_8:
-        return 'Мировому судье судебного участка №8 в Березовском районе Красноярского края Белявцевой Е.А.'
-    elif street == 'Дружбы' and number in JUDICIAL_PRECINCT_8[2][street]:
-        return 'Мировому судье судебного участка №8 в Березовском районе Красноярского края Белявцевой Е.А.'
+def is_valid(newval):
+    result = re.match("^\+{0,1}\d{0,11}$", newval) is not None
+    if not result and len(newval) <= 12:
+        errmsg.set("Номер телефона должен быть в формате +xxxxxxxxxxx, где x представляет цифру")
     else:
-        return 'ОШИБКА! Не найден судебный участок!'
+        errmsg.set("")
+    return result
 
 
-print(COURT_NUMBER(street,number))
+root = Tk()
+root.title("METANIT.COM")
+root.geometry("250x200")
+
+check = (root.register(is_valid), "%P")
+
+errmsg = StringVar()
+
+phone_entry = ttk.Entry(validate="key", validatecommand=check)
+phone_entry.pack(padx=5, pady=5, anchor=NW)
+
+error_label = ttk.Label(foreground="red", textvariable=errmsg, wraplength=250)
+error_label.pack(padx=5, pady=5, anchor=NW)
+
+root.mainloop()

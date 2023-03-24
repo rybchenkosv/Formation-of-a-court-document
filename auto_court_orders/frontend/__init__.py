@@ -1,1 +1,0 @@
-from auto_court_orders import frontend
