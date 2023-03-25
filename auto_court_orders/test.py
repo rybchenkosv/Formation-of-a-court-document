@@ -4,11 +4,11 @@ from tkinter import ttk
 
 def check(*args):
     print(name)
-    if name.get() == "admin":
-        result.set("запрещенное имя")
+    if len(name.get()) == 10:
+        if '.' in str(name.get) and len(str(name.get()).replace('.',"")) == 8:
+            result.set("")
     else:
-        result.set("норм")
-
+        result.set("Введите корректную дату \ndd.mm.yyyy")
 
 root = Tk()
 root.title("METANIT.COM")
@@ -22,6 +22,7 @@ name_entry.pack(padx=5, pady=5, anchor=NW)
 
 check_label = ttk.Label(textvariable=result)
 check_label.pack(padx=5, pady=5, anchor=NW)
+
 
 # отслеживаем изменение значения переменной name
 name.trace_add("write", check)

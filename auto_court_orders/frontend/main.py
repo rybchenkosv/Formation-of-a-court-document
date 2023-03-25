@@ -27,6 +27,15 @@ def SELECT_HOUSE_NUMBER(event):
     NUMBER_LIST_OF_HOUSE.set(Database.RESIDENTIAL_FUND[VALUE][0])
     BOX_NUMBER.config(values=Database.RESIDENTIAL_FUND[VALUE])
 
+def CHECKING_THE_CORRECT_ENTRY_OF_THE_DATE_OF_BIRTH(*args):
+    if len(date_debtors.get()) == 10:
+        if '.' in str(date_debtors.get) and len(str(date_debtors.get()).replace('.',"")) == 8:
+            result_date_of_birth.set("")
+        else:
+            result_date_of_birth.set("Введите корректную дату dd.mm.yyyy")
+    else:
+        result_date_of_birth.set("Введите корректную дату dd.mm.yyyy")
+
 
 ## BLOCKS ON THE LEFT
 ## SIDE OF THE APPLICATION
@@ -85,30 +94,37 @@ LABEL_DEBTORS_DATE_OF_BIRTH = Label(text="Укажите дату рождени
 LABEL_DEBTORS_DATE_OF_BIRTH.grid(row=8, column=0)
 
 #FIVE WINDOW PART
-DEBTORS_DATE_OF_BIRTH_LABEL = Entry(width=15)
+date_debtors = StringVar()
+DEBTORS_DATE_OF_BIRTH_LABEL = Entry(width=15, textvariable=date_debtors)
 DEBTORS_DATE_OF_BIRTH_LABEL.grid(row=9, column=0)
 DEBTORS_DATE_OF_BIRTH = DEBTORS_DATE_OF_BIRTH_LABEL.get() #ПОКА ПУСТОЕ ПРИСВАИВАНИЕ, ПОСЛЕ НЕОБХОДИМО ВНЕДРИТЬ С ПРОВЕРКОЙ!
+
+#OUTPUT BLOCK OF INCORRECT INPUT OF DATE OF BIRTH
+result_date_of_birth = StringVar()
+DATE_OF_BIRTH_VERIFICATION_RESULT = Label(textvariable=result_date_of_birth)
+DATE_OF_BIRTH_VERIFICATION_RESULT.grid(row=10, column=0)
+date_debtors.trace_add("write", CHECKING_THE_CORRECT_ENTRY_OF_THE_DATE_OF_BIRTH)
 
 #DEBTORS DATE OF BIRTH
 #TEXT PART
 LABEL_PASSPORT_DATA_OF_THE_DEBTOR = Label(text="Укажите паспортные данные должника", font=("Arial", 10))
-LABEL_PASSPORT_DATA_OF_THE_DEBTOR.grid(row=10, column=0)
+LABEL_PASSPORT_DATA_OF_THE_DEBTOR.grid(row=11, column=0)
 
 #SIX WINDOW PART
 PASSPORT_DATA_OF_THE_DEBTOR_LABEL = Entry(width=40)
-PASSPORT_DATA_OF_THE_DEBTOR_LABEL.grid(row=11, column=0)
+PASSPORT_DATA_OF_THE_DEBTOR_LABEL.grid(row=12, column=0)
 PASSPORT_DATA_OF_THE_DEBTOR = PASSPORT_DATA_OF_THE_DEBTOR_LABEL.get() #ПОКА ПУСТОЕ ПРИСВАИВАНИЕ, ПОСЛЕ НЕОБХОДИМО ВНЕДРИТЬ С ПРОВЕРКОЙ!
 
 #CONFIRMATION OF REGISTRATION AND PROPERTY
 #SEVEN WINDOW PART
 PROPERTY_CONFIRMATION_STR = StringVar()
 PROPERTY_CONFIRMATION_LABEL = Checkbutton(text="Является собственником", variable=PROPERTY_CONFIRMATION_STR)
-PROPERTY_CONFIRMATION_LABEL.grid(row=12, column=0)
+PROPERTY_CONFIRMATION_LABEL.grid(row=13, column=0)
 PROPERTY_CONFIRMATION = PROPERTY_CONFIRMATION_STR.get() #ПОКА ПУСТОЕ ПРИСВАИВАНИЕ, ПОСЛЕ НЕОБХОДИМО ВНЕДРИТЬ С ПРОВЕРКОЙ!
 #EIGHT WINDOW PART
 REGISTRATION_CHECK_STR = StringVar()
 REGISTRATION_CHECK_LABEL = Checkbutton(text="Прописан", variable=REGISTRATION_CHECK_STR)
-REGISTRATION_CHECK_LABEL.grid(row=13, column=0)
+REGISTRATION_CHECK_LABEL.grid(row=14, column=0)
 REGISTRATION_CHECK = REGISTRATION_CHECK_STR.get() #ПОКА ПУСТОЕ ПРИСВАИВАНИЕ, ПОСЛЕ НЕОБХОДИМО ВНЕДРИТЬ С ПРОВЕРКОЙ!
 
 
