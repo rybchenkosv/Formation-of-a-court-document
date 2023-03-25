@@ -128,9 +128,9 @@ def MANAGEMENT_START_DATE(street,number):
 
 def AMOUNT_OF_THE_STATE_FEE(AMOUNT_OF_DEBT):
     if AMOUNT_OF_DEBT <= float(10000):
-        return round(float(200))
+        return '{:.2f}'.format(float(200))
     elif AMOUNT_OF_DEBT <= float(20001):
-        return AMOUNT_OF_DEBT / 100 * 2
+        return '{:.2f}'.format(AMOUNT_OF_DEBT / 100 * 2)
     else:
-        return 400 + (AMOUNT_OF_DEBT - 20000) / 100 * 1.5
+        return '{:.2f}'.format(400 + (AMOUNT_OF_DEBT - 20000) / 100 * 1.5)
 

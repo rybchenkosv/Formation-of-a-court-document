@@ -1,30 +1,35 @@
-from tkinter import *
-from tkinter import ttk
+import tkinter as tk
+
+from datetime import datetime
 
 
-def check(*args):
-    print(name)
-    if len(name.get()) == 10:
-        if '.' in str(name.get) and len(str(name.get()).replace('.',"")) == 8:
-            result.set("")
-    else:
-        result.set("Введите корректную дату \ndd.mm.yyyy")
+def clock():
+    clock_window = tk.Toplevel()
+    clock_window.title("Часы")
+    label = tk.Label(clock_window, font=("helvetica", 40))
+    label.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
 
-root = Tk()
-root.title("METANIT.COM")
-root.geometry("250x200")
+    def update_time():
+        clock_window.geometry('270x450+{}+{}'.format(500, 400))
+        label.config(text=f"{datetime.now():%H:%M:%S}")
+        clock_window.after(100, update_time)  # Запланировать выполнение этой же функции через 100 миллисекунд
 
-name = StringVar()
-result = StringVar()
-
-name_entry = ttk.Entry(textvariable=name)
-name_entry.pack(padx=5, pady=5, anchor=NW)
-
-check_label = ttk.Label(textvariable=result)
-check_label.pack(padx=5, pady=5, anchor=NW)
+    update_time()
 
 
-# отслеживаем изменение значения переменной name
-name.trace_add("write", check)
+window = tk.Tk()
+window.geometry('270x450')
 
-root.mainloop()
+button_1 = tk.Button(text='Часы', width=10, height=5, font=('Roman 10'), command=clock)
+button_1.place(x=50, y=50)
+
+button_2 = tk.Button(text='Календарь', width=12, height=6, font=('Roman 8'))
+button_2.place(x=150, y=50)
+
+button_3 = tk.Button(text='Настройки', width=10, height=5, font=('Roman 9'))
+button_3.place(x=50, y=150)
+
+button_4 = tk.Button(text='Игра', width=10, height=5, font=('Roman 10'))
+button_4.place(x=150, y=150)
+
+window.mainloop()

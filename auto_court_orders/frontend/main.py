@@ -2,6 +2,7 @@ from tkinter import Tk, Button, Frame, StringVar
 from tkinter import *
 from tkinter.ttk import Combobox, Label
 from auto_court_orders import Database
+from tkcalendar import Calendar, DateEntry
 
 root = Tk()
 root.title("Формирование судебного приказа в мировой суд") #THE DISPLAYED NAME OF THE PROGRAM
@@ -19,7 +20,6 @@ def ASSIGNING_VALUES_TO_VARIABLES_ON_THE_RIGHT_SIDE(event):
     COMPANY_ADDRESS_LABEL["text"] = f"{Database.ADDRESS_OF_THE_CLAIMANT(VARIABLE_STREET, VARIABLE_NUMBER)}"
     JUDICIAL_SECTION_LABEL["text"] = f"{Database.COURT_NUMBER(VARIABLE_STREET, VARIABLE_NUMBER)}"
     MANAGEMENT_START_DATE_LABEL["text"] = f"{Database.MANAGEMENT_START_DATE(VARIABLE_STREET, VARIABLE_NUMBER)}"
-    AMOUNT_OF_THE_STATE_DUTY_LABEL["text"] = f"{main.AMOUNT_OF_THE_STATE_FEE(AMOUNT_OF_DEBT)}"
 
 #FUNCTION RETURNING A LIST OF NUMBERS OF THE SELECTED HOUSE
 def SELECT_HOUSE_NUMBER(event):
@@ -35,6 +35,18 @@ def CHECKING_THE_CORRECT_ENTRY_OF_THE_DATE_OF_BIRTH(*args):
             result_date_of_birth.set("Введите корректную дату dd.mm.yyyy")
     else:
         result_date_of_birth.set("Введите корректную дату dd.mm.yyyy")
+
+def FUNCTION_WITH_DISPLAY_OF_THE_AMOUNT_OF_GOVERNMENT(*args):
+    try:
+        result_of_the_fee_calculation.set(Database.AMOUNT_OF_THE_STATE_FEE(float(format_for_entering_the_amount_of_the_debt.get())))
+    except:
+        return result_of_the_fee_calculation.set('Сумма введена некорректно')
+
+def FUNCTION_TO_DISPLAY_THE_TOTAL_AMOUNT_OF_DEBT(*args):
+    try:
+        total_debt.set('{:.2f}'.format(float(format_for_entering_the_amount_of_the_debt.get()) + float(result_of_the_fee_calculation.get())))
+    except:
+        return total_debt.set('Сумма введена некорректно')
 
 
 ## BLOCKS ON THE LEFT
@@ -168,7 +180,8 @@ LABEL_DEBTORS_DEBT = Label(text="Сумма задолженности", font=("
 LABEL_DEBTORS_DEBT.grid(row=8, column=2)
 
 #LABEL AMOUNT OF DEBTOR'S DEBT
-DEBTOR_DEBT_LABEL = Entry(width=40)
+format_for_entering_the_amount_of_the_debt = StringVar()
+DEBTOR_DEBT_LABEL = Entry(width=40, textvariable=format_for_entering_the_amount_of_the_debt)
 DEBTOR_DEBT_LABEL.grid(row=9, column=2)
 DEBTOR_DEBT = DEBTOR_DEBT_LABEL.get() #ПОКА ПУСТОЕ ПРИСВАИВАНИЕ, ПОСЛЕ НЕОБХОДИМО ВНЕДРИТЬ С ПРОВЕРКОЙ!
 
@@ -177,10 +190,41 @@ LABEL_AMOUNT_OF_THE_STATE_DUTY = Label(text="Сумма гос.пошлины", 
 LABEL_AMOUNT_OF_THE_STATE_DUTY.grid(row=10, column=2)
 
 #LABEL AMOUNT OF THE STATE DUTY
-AMOUNT_OF_THE_STATE_DUTY_LABEL = Label()
+result_of_the_fee_calculation = StringVar()
+AMOUNT_OF_THE_STATE_DUTY_LABEL = Label(textvariable=result_of_the_fee_calculation)
 AMOUNT_OF_THE_STATE_DUTY_LABEL.grid(row=11, column=2)
+format_for_entering_the_amount_of_the_debt.trace_add("write", FUNCTION_WITH_DISPLAY_OF_THE_AMOUNT_OF_GOVERNMENT)
+AMOUNT_OF_THE_STATE_DUTY = result_of_the_fee_calculation.get() #ПОКА ПУСТОЕ ПРИСВАИВАНИЕ, ПОСЛЕ НЕОБХОДИМО ВНЕДРИТЬ С ПРОВЕРКОЙ!
 
+#BLOCK TOTAL DEBT
+LABEL_TOTAL_DEBT = Label(text="Общая сумма задолженности", font=("Arial", 10))
+LABEL_TOTAL_DEBT.grid(row=12, column=2)
 
+#LABEL TOTAL DEBT
+total_debt = StringVar()
+TOTAL_DEBT_LABEL = Label(textvariable=total_debt)
+TOTAL_DEBT_LABEL.grid(row=13, column=2)
+result_of_the_fee_calculation.trace_add("write", FUNCTION_TO_DISPLAY_THE_TOTAL_AMOUNT_OF_DEBT)
 
+#DEBTY PERIOD BLOCK
+##TEXT PART
+LABEL_DEBT_PERIOD = Label(text="Укажите период задолженности", font=("Arial", 10))
+LABEL_DEBT_PERIOD.grid(row=14, column=2)
+
+##TEXT PART
+LABEL_DEBT_PERIOD1 = Label(text="c", font=("Arial", 10))
+LABEL_DEBT_PERIOD1.grid(row=15, column=2)
+
+#BLOCK BEGINNING OF PERIOD
+BEGINNING_OF_PERIOD = DateEntry(root, width=16, background="magenta3", foreground="white", bd=2)
+BEGINNING_OF_PERIOD.grid(row=15, column=3)
+
+##TEXT PART
+LABEL_DEBT_PERIOD2 = Label(text="по", font=("Arial", 10))
+LABEL_DEBT_PERIOD2.grid(row=15, column=4)
+
+#BLOCK END OF PERIOD
+END_OF_PERIOD = DateEntry(root, width=16, background="magenta3", foreground="white", bd=2)
+END_OF_PERIOD.grid(row=15, column=5)
 
 root.mainloop()
