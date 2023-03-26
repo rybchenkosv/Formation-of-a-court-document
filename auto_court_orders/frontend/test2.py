@@ -2,6 +2,7 @@ from tkinter import Tk, Button, Frame, StringVar
 from tkinter import *
 from tkinter.ttk import Combobox, Label, Treeview
 from auto_court_orders import Database
+from window_for_checking_and_sending_data import VALIDATION_AND_DATA_GENERATION_FUNCTION
 from tkcalendar import Calendar, DateEntry
 from tkinter.messagebox import showwarning
 
@@ -30,13 +31,17 @@ def SELECT_HOUSE_NUMBER(event):
 
 #FUNCTION OF VERIFICATION OF THE CORRECTNESS OF THE ENTERED DATE OF BIRTH OF THE DEBTOR
 def CHECKING_THE_CORRECT_ENTRY_OF_THE_DATE_OF_BIRTH(*args):
+    global date_of_birth_check_variable
     if len(date_debtors.get()) == 10:
         if '.' in str(date_debtors.get) and len(str(date_debtors.get()).replace('.',"")) == 8:
             result_date_of_birth.set("")
+            date_of_birth_check_variable = 'Yes'
         else:
             result_date_of_birth.set("Введите корректную дату dd.mm.yyyy")
+            date_of_birth_check_variable = 'No'
     else:
         result_date_of_birth.set("Введите корректную дату dd.mm.yyyy")
+        date_of_birth_check_variable = 'No'
 
 #FUNCTION OF VERIFICATION OF CORRECTNESS OF THE INTRODUCED AMOUNT OF DEBT
 def FUNCTION_WITH_DISPLAY_OF_THE_AMOUNT_OF_GOVERNMENT(*args):
@@ -55,31 +60,37 @@ def FUNCTION_TO_DISPLAY_THE_TOTAL_AMOUNT_OF_DEBT(*args):
 #FUNCTION OF COLLECTING DEBTORS TO THE BASE AND DISPLAYING TO THE APPLICATION TABLE
 def ENTER_DATA_IN_THE_TABLE(*args):
     list_for_a_new_debtor = []
-    if PROPERTY_CONFIRMATION_STR.get() == '1' and REGISTRATION_CHECK_STR.get() == '1': #CHECKING WHETHER THE DEBTOR IS OWNER OR REGISTERED
-        general_list_of_debtors.append((len(general_list_of_debtors) + 1, DEBTORS_FULL_NAME_LABEL.get(), DEBTORS_DATE_OF_BIRTH_LABEL.get(),
-                             PASSPORT_DATA_OF_THE_DEBTOR_LABEL.get(), '+', '+'))
-        list_for_a_new_debtor.append((len(general_list_of_debtors), DEBTORS_FULL_NAME_LABEL.get(), DEBTORS_DATE_OF_BIRTH_LABEL.get(),
-                             PASSPORT_DATA_OF_THE_DEBTOR_LABEL.get(), '+', '+'))
-    elif PROPERTY_CONFIRMATION_STR.get() == '1' and REGISTRATION_CHECK_STR.get() == '0':
-        general_list_of_debtors.append((len(general_list_of_debtors) + 1, DEBTORS_FULL_NAME_LABEL.get(), DEBTORS_DATE_OF_BIRTH_LABEL.get(),
-                             PASSPORT_DATA_OF_THE_DEBTOR_LABEL.get(), '+', '-'))
-        list_for_a_new_debtor.append((len(general_list_of_debtors), DEBTORS_FULL_NAME_LABEL.get(), DEBTORS_DATE_OF_BIRTH_LABEL.get(),
-                             PASSPORT_DATA_OF_THE_DEBTOR_LABEL.get(), '+', '-'))
-    elif PROPERTY_CONFIRMATION_STR.get() == '0' and REGISTRATION_CHECK_STR.get() == '1':
-        general_list_of_debtors.append((len(general_list_of_debtors) + 1, DEBTORS_FULL_NAME_LABEL.get(), DEBTORS_DATE_OF_BIRTH_LABEL.get(),
-                             PASSPORT_DATA_OF_THE_DEBTOR_LABEL.get(), '-', '+'))
-        list_for_a_new_debtor.append((len(general_list_of_debtors), DEBTORS_FULL_NAME_LABEL.get(), DEBTORS_DATE_OF_BIRTH_LABEL.get(),
-                             PASSPORT_DATA_OF_THE_DEBTOR_LABEL.get(), '-', '+'))
-    elif PROPERTY_CONFIRMATION_STR.get() == '0' and REGISTRATION_CHECK_STR.get() == '0':
-        general_list_of_debtors.append((len(general_list_of_debtors) + 1, DEBTORS_FULL_NAME_LABEL.get(), DEBTORS_DATE_OF_BIRTH_LABEL.get(),
-                             PASSPORT_DATA_OF_THE_DEBTOR_LABEL.get(), '-', '-'))
-        list_for_a_new_debtor.append((len(general_list_of_debtors), DEBTORS_FULL_NAME_LABEL.get(), DEBTORS_DATE_OF_BIRTH_LABEL.get(),
-                             PASSPORT_DATA_OF_THE_DEBTOR_LABEL.get(), '-', '-'))
     if PROPERTY_CONFIRMATION_STR.get() == '' or REGISTRATION_CHECK_STR.get() == '': #OUTPUT OF THE ERROR WINDOW OF NOT SPECIFIED DATA ABOUT REGISTERED OR OWNERS
         return showwarning(title="Ошибка", message="Вы не указали данные о том, является ли Должник собственником или прописанным")
     else:
-        for person in list_for_a_new_debtor:
-            TABLE_PARAMETERS.insert("", END, values=person)
+        if DEBTORS_FULL_NAME_LABEL.get() == '' or DEBTORS_DATE_OF_BIRTH_LABEL.get() == '' or PASSPORT_DATA_OF_THE_DEBTOR_LABEL.get() == '':
+            return showwarning(title="Ошибка", message="Заполните все поля")
+        else:
+            if date_of_birth_check_variable == 'Yes':
+                if PROPERTY_CONFIRMATION_STR.get() == '1' and REGISTRATION_CHECK_STR.get() == '1':  # CHECKING WHETHER THE DEBTOR IS OWNER OR REGISTERED
+                    general_list_of_debtors.append((len(general_list_of_debtors) + 1, DEBTORS_FULL_NAME_LABEL.get(), DEBTORS_DATE_OF_BIRTH_LABEL.get(),
+                                                    PASSPORT_DATA_OF_THE_DEBTOR_LABEL.get(), '+', '+'))
+                    list_for_a_new_debtor.append((len(general_list_of_debtors), DEBTORS_FULL_NAME_LABEL.get(), DEBTORS_DATE_OF_BIRTH_LABEL.get(),
+                                                  PASSPORT_DATA_OF_THE_DEBTOR_LABEL.get(), '+', '+'))
+                elif PROPERTY_CONFIRMATION_STR.get() == '1' and REGISTRATION_CHECK_STR.get() == '0':
+                    general_list_of_debtors.append((len(general_list_of_debtors) + 1, DEBTORS_FULL_NAME_LABEL.get(), DEBTORS_DATE_OF_BIRTH_LABEL.get(),
+                                                    PASSPORT_DATA_OF_THE_DEBTOR_LABEL.get(), '+', '-'))
+                    list_for_a_new_debtor.append((len(general_list_of_debtors), DEBTORS_FULL_NAME_LABEL.get(), DEBTORS_DATE_OF_BIRTH_LABEL.get(),
+                                                  PASSPORT_DATA_OF_THE_DEBTOR_LABEL.get(), '+', '-'))
+                elif PROPERTY_CONFIRMATION_STR.get() == '0' and REGISTRATION_CHECK_STR.get() == '1':
+                    general_list_of_debtors.append((len(general_list_of_debtors) + 1, DEBTORS_FULL_NAME_LABEL.get(), DEBTORS_DATE_OF_BIRTH_LABEL.get(),
+                                                    PASSPORT_DATA_OF_THE_DEBTOR_LABEL.get(), '-', '+'))
+                    list_for_a_new_debtor.append((len(general_list_of_debtors), DEBTORS_FULL_NAME_LABEL.get(), DEBTORS_DATE_OF_BIRTH_LABEL.get(),
+                                                  PASSPORT_DATA_OF_THE_DEBTOR_LABEL.get(), '-', '+'))
+                elif PROPERTY_CONFIRMATION_STR.get() == '0' and REGISTRATION_CHECK_STR.get() == '0':
+                    general_list_of_debtors.append((len(general_list_of_debtors) + 1, DEBTORS_FULL_NAME_LABEL.get(), DEBTORS_DATE_OF_BIRTH_LABEL.get(),
+                                                    PASSPORT_DATA_OF_THE_DEBTOR_LABEL.get(), '-', '-'))
+                    list_for_a_new_debtor.append((len(general_list_of_debtors), DEBTORS_FULL_NAME_LABEL.get(), DEBTORS_DATE_OF_BIRTH_LABEL.get(),
+                                                  PASSPORT_DATA_OF_THE_DEBTOR_LABEL.get(), '-', '-'))
+                for person in list_for_a_new_debtor:
+                    TABLE_PARAMETERS.insert("", END, values=person)
+            else:
+                return showwarning(title="Ошибка", message="Вы неверно заполнили поле 'Дата рождения должника'")
 
 
 ## BLOCKS ON THE LEFT
@@ -173,8 +184,8 @@ REGISTRATION_CHECK_LABEL.grid(row=14, column=0)
 REGISTRATION_CHECK = REGISTRATION_CHECK_STR.get() #ПОКА ПУСТОЕ ПРИСВАИВАНИЕ, ПОСЛЕ НЕОБХОДИМО ВНЕДРИТЬ С ПРОВЕРКОЙ!
 
 #DEBTOR FORMATION BLOCK AND ADDITIONS TO THE TABLE
-btn = Button(text="Добавить должника", command=ENTER_DATA_IN_THE_TABLE)
-btn.grid(row=15, column=0)
+BUTTON_ADD_DEBTOR = Button(text="Добавить должника", command=ENTER_DATA_IN_THE_TABLE)
+BUTTON_ADD_DEBTOR.grid(row=15, column=0)
 
 
 
@@ -295,6 +306,13 @@ TABLE_PARAMETERS.column("#3", stretch=NO, width=200)
 TABLE_PARAMETERS.column("#4", stretch=NO, width=300)
 TABLE_PARAMETERS.column("#5", stretch=NO, width=85)
 TABLE_PARAMETERS.column("#6", stretch=NO, width=85)
+
+
+# КНОПКА ФОРМИРОВАНИЯ ПРИКАЗА
+
+btn = Button(text="СФОРМИРОВАТЬ ПРИКАЗ", command=VALIDATION_AND_DATA_GENERATION_FUNCTION)
+btn.grid(row=18, column=0)
+
 
 
 root.mainloop()
