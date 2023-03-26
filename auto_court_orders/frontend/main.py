@@ -1,8 +1,9 @@
 from tkinter import Tk, Button, Frame, StringVar
 from tkinter import *
-from tkinter.ttk import Combobox, Label
+from tkinter.ttk import Combobox, Label, Treeview
 from auto_court_orders import Database
 from tkcalendar import Calendar, DateEntry
+from tkinter.messagebox import showwarning
 
 root = Tk()
 root.title("Формирование судебного приказа в мировой суд") #THE DISPLAYED NAME OF THE PROGRAM
@@ -27,6 +28,7 @@ def SELECT_HOUSE_NUMBER(event):
     NUMBER_LIST_OF_HOUSE.set(Database.RESIDENTIAL_FUND[VALUE][0])
     BOX_NUMBER.config(values=Database.RESIDENTIAL_FUND[VALUE])
 
+#FUNCTION OF VERIFICATION OF THE CORRECTNESS OF THE ENTERED DATE OF BIRTH OF THE DEBTOR
 def CHECKING_THE_CORRECT_ENTRY_OF_THE_DATE_OF_BIRTH(*args):
     if len(date_debtors.get()) == 10:
         if '.' in str(date_debtors.get) and len(str(date_debtors.get()).replace('.',"")) == 8:
@@ -36,17 +38,48 @@ def CHECKING_THE_CORRECT_ENTRY_OF_THE_DATE_OF_BIRTH(*args):
     else:
         result_date_of_birth.set("Введите корректную дату dd.mm.yyyy")
 
+#FUNCTION OF VERIFICATION OF CORRECTNESS OF THE INTRODUCED AMOUNT OF DEBT
 def FUNCTION_WITH_DISPLAY_OF_THE_AMOUNT_OF_GOVERNMENT(*args):
     try:
         result_of_the_fee_calculation.set(Database.AMOUNT_OF_THE_STATE_FEE(float(format_for_entering_the_amount_of_the_debt.get())))
     except:
         return result_of_the_fee_calculation.set('Сумма введена некорректно')
 
+#FUNCTION OF VERIFICATION OF CORRECTNESS OF THE INTRODUCED AMOUNT OF DEBT
 def FUNCTION_TO_DISPLAY_THE_TOTAL_AMOUNT_OF_DEBT(*args):
     try:
         total_debt.set('{:.2f}'.format(float(format_for_entering_the_amount_of_the_debt.get()) + float(result_of_the_fee_calculation.get())))
     except:
         return total_debt.set('Сумма введена некорректно')
+
+#FUNCTION OF COLLECTING DEBTORS TO THE BASE AND DISPLAYING TO THE APPLICATION TABLE
+def ENTER_DATA_IN_THE_TABLE(*args):
+    list_for_a_new_debtor = []
+    if PROPERTY_CONFIRMATION_STR.get() == '1' and REGISTRATION_CHECK_STR.get() == '1': #CHECKING WHETHER THE DEBTOR IS OWNER OR REGISTERED
+        general_list_of_debtors.append((len(general_list_of_debtors) + 1, DEBTORS_FULL_NAME_LABEL.get(), DEBTORS_DATE_OF_BIRTH_LABEL.get(),
+                             PASSPORT_DATA_OF_THE_DEBTOR_LABEL.get(), '+', '+'))
+        list_for_a_new_debtor.append((len(general_list_of_debtors), DEBTORS_FULL_NAME_LABEL.get(), DEBTORS_DATE_OF_BIRTH_LABEL.get(),
+                             PASSPORT_DATA_OF_THE_DEBTOR_LABEL.get(), '+', '+'))
+    elif PROPERTY_CONFIRMATION_STR.get() == '1' and REGISTRATION_CHECK_STR.get() == '0':
+        general_list_of_debtors.append((len(general_list_of_debtors) + 1, DEBTORS_FULL_NAME_LABEL.get(), DEBTORS_DATE_OF_BIRTH_LABEL.get(),
+                             PASSPORT_DATA_OF_THE_DEBTOR_LABEL.get(), '+', '-'))
+        list_for_a_new_debtor.append((len(general_list_of_debtors), DEBTORS_FULL_NAME_LABEL.get(), DEBTORS_DATE_OF_BIRTH_LABEL.get(),
+                             PASSPORT_DATA_OF_THE_DEBTOR_LABEL.get(), '+', '-'))
+    elif PROPERTY_CONFIRMATION_STR.get() == '0' and REGISTRATION_CHECK_STR.get() == '1':
+        general_list_of_debtors.append((len(general_list_of_debtors) + 1, DEBTORS_FULL_NAME_LABEL.get(), DEBTORS_DATE_OF_BIRTH_LABEL.get(),
+                             PASSPORT_DATA_OF_THE_DEBTOR_LABEL.get(), '-', '+'))
+        list_for_a_new_debtor.append((len(general_list_of_debtors), DEBTORS_FULL_NAME_LABEL.get(), DEBTORS_DATE_OF_BIRTH_LABEL.get(),
+                             PASSPORT_DATA_OF_THE_DEBTOR_LABEL.get(), '-', '+'))
+    elif PROPERTY_CONFIRMATION_STR.get() == '0' and REGISTRATION_CHECK_STR.get() == '0':
+        general_list_of_debtors.append((len(general_list_of_debtors) + 1, DEBTORS_FULL_NAME_LABEL.get(), DEBTORS_DATE_OF_BIRTH_LABEL.get(),
+                             PASSPORT_DATA_OF_THE_DEBTOR_LABEL.get(), '-', '-'))
+        list_for_a_new_debtor.append((len(general_list_of_debtors), DEBTORS_FULL_NAME_LABEL.get(), DEBTORS_DATE_OF_BIRTH_LABEL.get(),
+                             PASSPORT_DATA_OF_THE_DEBTOR_LABEL.get(), '-', '-'))
+    if PROPERTY_CONFIRMATION_STR.get() == '' or REGISTRATION_CHECK_STR.get() == '': #OUTPUT OF THE ERROR WINDOW OF NOT SPECIFIED DATA ABOUT REGISTERED OR OWNERS
+        return showwarning(title="Ошибка", message="Вы не указали данные о том, является ли Должник собственником или прописанным")
+    else:
+        for person in list_for_a_new_debtor:
+            TABLE_PARAMETERS.insert("", END, values=person)
 
 
 ## BLOCKS ON THE LEFT
@@ -139,6 +172,11 @@ REGISTRATION_CHECK_LABEL = Checkbutton(text="Прописан", variable=REGISTR
 REGISTRATION_CHECK_LABEL.grid(row=14, column=0)
 REGISTRATION_CHECK = REGISTRATION_CHECK_STR.get() #ПОКА ПУСТОЕ ПРИСВАИВАНИЕ, ПОСЛЕ НЕОБХОДИМО ВНЕДРИТЬ С ПРОВЕРКОЙ!
 
+#DEBTOR FORMATION BLOCK AND ADDITIONS TO THE TABLE
+btn = Button(text="Добавить должника", command=ENTER_DATA_IN_THE_TABLE)
+btn.grid(row=15, column=0)
+
+
 
 ## BLOCKS ON THE RIGHT
 ## SIDE OF THE APPLICATION
@@ -226,5 +264,37 @@ LABEL_DEBT_PERIOD2.grid(row=15, column=4)
 #BLOCK END OF PERIOD
 END_OF_PERIOD = DateEntry(root, width=16, background="magenta3", foreground="white", bd=2)
 END_OF_PERIOD.grid(row=15, column=5)
+
+#CENTRAL BLOCK
+#TABLE
+
+#GENERAL LIST OF DEBTORS AND DATA ABOUT THEM
+general_list_of_debtors = []
+
+
+#ZERO BLOCK FOR EMPTY FIELD
+ZERO_BLOCK = Label(text="", font=("Arial", 10))
+ZERO_BLOCK.grid(row=16, column=0)
+
+#TABLE CREATION BLOCK
+TABLE_HEADINGS = ("number", "name", "date_of_birth", "passport_data", "debtor_owner", "debtor_is_registered")
+TABLE_PARAMETERS = Treeview(columns=TABLE_HEADINGS, show="headings")
+TABLE_PARAMETERS.grid(row=17, column=0, sticky="nsew")
+
+#TABLE HEADING BLOCK
+TABLE_PARAMETERS.heading("number", text="№", anchor=W)
+TABLE_PARAMETERS.heading("name", text="ФИО должника", anchor=W)
+TABLE_PARAMETERS.heading("date_of_birth", text="Дата рождения должника", anchor=W)
+TABLE_PARAMETERS.heading("passport_data", text="Паспортные данные должника", anchor=W)
+TABLE_PARAMETERS.heading("debtor_owner", text="Собственник", anchor=W)
+TABLE_PARAMETERS.heading("debtor_is_registered", text="Прописан", anchor=W)
+
+TABLE_PARAMETERS.column("#1", stretch=NO, width=25)
+TABLE_PARAMETERS.column("#2", stretch=NO, width=200)
+TABLE_PARAMETERS.column("#3", stretch=NO, width=200)
+TABLE_PARAMETERS.column("#4", stretch=NO, width=300)
+TABLE_PARAMETERS.column("#5", stretch=NO, width=85)
+TABLE_PARAMETERS.column("#6", stretch=NO, width=85)
+
 
 root.mainloop()
