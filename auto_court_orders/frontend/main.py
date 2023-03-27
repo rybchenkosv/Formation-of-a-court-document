@@ -4,6 +4,7 @@ from tkinter.ttk import Combobox, Label, Treeview
 from auto_court_orders import Database
 from tkcalendar import Calendar, DateEntry
 from tkinter.messagebox import showwarning
+from docxtpl import DocxTemplate
 
 root = Tk()
 root.title("Формирование судебного приказа в мировой суд")  # THE DISPLAYED NAME OF THE PROGRAM
@@ -193,12 +194,103 @@ def VALIDATION_AND_DATA_GENERATION_FUNCTION():
     NAME_DEBTORS_LABEL.insert(0, f'{VARIABLE_STREET} {VARIABLE_NUMBER}-{APARTMENT_NUMBER_LABEL.get()}')
     NAME_DEBTORS_LABEL.grid(row=8 + counter_t, column=1)
 
-    def gg():
-        print(NAME_DEBTORS_LABEL.get())
-        print(general_list_of_debtors_second_window)
-        print(general_list_of_debtors)
+#FUNCTION OF DATA CONVERSION TO DOC FORMAT AND SAVING OF THE FINISHED DOCUMENT
+    def TEXT_DOCUMENT():
+        # THE FUNCTION OF FORMING FROM THE RECEIVED DATA A STRING WITH \n HYPHENATIONS
+        # FOR TRANSMISSION TO DOC
+        def DOC_DATA_GENERATION_FUNCTION(data):
+            assembly_variable = ''
+            for i in data:
+                for j in range(len(i)):
+                    if j != 0:
+                        if j == 2:
+                            assembly_variable += i[j] + ' года рождения'
+                            assembly_variable += '\n'
+                        else:
+                            assembly_variable += i[j]
+                            assembly_variable += '\n'
+                assembly_variable += '\n'
+            return assembly_variable
 
-    SENDING_FILES_TO_A_DOC_LABEL = Button(window, text="ОТПРАВИТЬ", command=gg)
+        def FUNCTION_OF_COLLECTION_FROM_OWNERS_OF_DEBTORS(data):
+            assembly_variable = ''
+            for i in data:
+                if i[4] == '+':
+                    assembly_variable += i[1] + ', '
+            return assembly_variable[:len(assembly_variable) - 2]
+
+        def FUNCTION_OF_COLLECTION_REGISTERED_DEBTORS(data):
+            assembly_variable = ''
+            for i in data:
+                if i[5] == '+':
+                    assembly_variable += i[1] + ', '
+            if len(assembly_variable) != 0:
+                return assembly_variable[:len(assembly_variable) - 2]
+            else:
+                return assembly_variable
+
+        def FUNCTION_TO_CHECK_REGISTERED_FOR_DOC(data):
+            assembly_variable = ''
+            for i in data:
+                if i[5] == '+':
+                    assembly_variable += i[1] + ', '
+            if len(assembly_variable) == 0:
+                return 'никто не состоит'
+            else:
+                return 'состоят'
+
+        def FUNCTION_TO_CHECK_THE_NUMBER_OF_OBLIGERS_FOR_DOC(data):
+            if len(data) > 1:
+                return 'в солидарном порядке с следующих должников:'
+            else:
+                return 'с следующих должников:'
+
+        def LIST_OF_DEBTORS_FUNCTION(data):
+            assembly_variable = ''
+            for i in data:
+                for j in range(len(i)):
+                    if j != 0 and j != 3:
+                        if j == 2:
+                            assembly_variable += i[j] + ' года рождения'
+                            assembly_variable += ', '
+                        else:
+                            assembly_variable += i[j] + ' '
+            return assembly_variable
+
+        def DEBT_PERIOD_FUNCTION(start, end):
+            text = 'c ' + start + ' г.' + ' по ' + end + ' г.'
+            return text
+
+        doc = DocxTemplate("shablonsydybprik.docx") #DOCUMENT TEMPLATE
+
+        context = {'name_of_the_court': JUDICIAL_SECTION_LABEL["text"],  # TRANSFERRING COURT DATA
+                   'claimant': COMPANY_NAME_LABEL["text"],  # TRANSFER OF CLAIMANTS
+                   'address_claimant': COMPANY_ADDRESS_LABEL["text"],  # TRANSFER ADDRESS CLAIMANT
+                   'debtors': DOC_DATA_GENERATION_FUNCTION(general_list_of_debtors_second_window), # DEBTORS
+                   'variable_street': VARIABLE_STREET,  # TRANSFER OF THE DEBTOR'S ADDRESS
+                   'variable_number': VARIABLE_NUMBER,  # TRANSFER OF THE HOUSE NUMBER OF THE DEBTOR
+                   'apartment_variable_number': APARTMENT_NUMBER_LABEL.get(),  # TRANSFER OF THE APARTMENT NUMBER OF THE DEBTOR
+                   'amount_debt': DEBTOR_DEBT_LABEL.get(),  # TRANSFER THE AMOUNT OF DEBT
+                   'amount_state_fee': result_of_the_fee_calculation.get(),  # TRANSFER STATE DUTY
+                   'owners_of_debtors': FUNCTION_OF_COLLECTION_FROM_OWNERS_OF_DEBTORS(general_list_of_debtors), # DEBTORS IN LIST FORMAT
+                   'check': FUNCTION_TO_CHECK_REGISTERED_FOR_DOC(general_list_of_debtors),
+                   # FORMATION OF THE TEXT DEPENDING ON WHETHER THE REGISTERED DEBTORS
+                   'registered_debtors': FUNCTION_OF_COLLECTION_REGISTERED_DEBTORS(general_list_of_debtors), # LIST OF REGISTERED
+                   'management_start': MANAGEMENT_START_DATE_LABEL["text"],  # TRANSFER THE STARTING DATE OF MANAGEMENT
+                   'debt_period': DEBT_PERIOD_FUNCTION(BEGINNING_OF_PERIOD.get(), END_OF_PERIOD.get()), # DEBT PERIOD
+                   'total_debt': total_debt.get(),  # TRANSFER TOTAL DEBT
+                   'check_quantity': FUNCTION_TO_CHECK_THE_NUMBER_OF_OBLIGERS_FOR_DOC(general_list_of_debtors),
+                   # FORMATION OF THE TEXT DEPENDING ON THE NUMBER OF DEBTORS
+                   'list_of_debtors': LIST_OF_DEBTORS_FUNCTION(general_list_of_debtors_second_window), # LIST OF DEBTORS
+                   }
+
+        save_folder_path = NAME_OF_THE_SAVE_ACT_LABEL['text'] # COMPUTER SAVE PATH VARIABLE
+        save_name = NAME_DEBTORS_LABEL.get() # VARIABLE ADDRESS AND APARTMENTS OF THE DEBTOR FOR TEXT FORMAT
+        doc.render(context) # GENERATION OF ALL DATA
+        doc.save(f"{save_folder_path}/{save_name}.docx") # TRANSFER AND SAVING DATA
+
+    # BUTTON FOR SENDING GENERATED DATA TO THE FUNCTION OF AUTOMATIC GENERATION AND SAVING DATA
+    SENDING_FILES_TO_A_DOC_LABEL = Button(window, text="ОТПРАВИТЬ", command=TEXT_DOCUMENT)
     SENDING_FILES_TO_A_DOC_LABEL.grid(row=9 + counter_t, column=0)
 
 
@@ -372,7 +464,7 @@ LABEL_DEBT_PERIOD1 = Label(text="c", font=("Arial", 10))
 LABEL_DEBT_PERIOD1.grid(row=15, column=2)
 
 # BLOCK BEGINNING OF PERIOD
-BEGINNING_OF_PERIOD = DateEntry(root, width=16, background="magenta3", foreground="white", bd=2)
+BEGINNING_OF_PERIOD = DateEntry(root, width=16, background="magenta3", date_pattern='dd.mm.yyyy', foreground="white", bd=2)
 BEGINNING_OF_PERIOD.grid(row=15, column=3)
 
 ##TEXT PART
@@ -380,7 +472,7 @@ LABEL_DEBT_PERIOD2 = Label(text="по", font=("Arial", 10))
 LABEL_DEBT_PERIOD2.grid(row=15, column=4)
 
 # BLOCK END OF PERIOD
-END_OF_PERIOD = DateEntry(root, width=16, background="magenta3", foreground="white", bd=2)
+END_OF_PERIOD = DateEntry(root, width=16, background="magenta3", date_pattern='dd.mm.yyyy', foreground="white", bd=2)
 END_OF_PERIOD.grid(row=15, column=5)
 
 # CENTRAL BLOCK
@@ -414,8 +506,9 @@ TABLE_PARAMETERS.column("#4", stretch=NO, width=300)
 TABLE_PARAMETERS.column("#5", stretch=NO, width=85)
 TABLE_PARAMETERS.column("#6", stretch=NO, width=85)
 
-# КНОПКА ФОРМИРОВАНИЯ ПРИКАЗА
+# ORDER FORMATION BUTTON
 btn = Button(text="СФОРМИРОВАТЬ ПРИКАЗ", command=VALIDATION_AND_DATA_GENERATION_FUNCTION)
 btn.grid(row=18, column=0)
+
 
 root.mainloop()
