@@ -1,8 +1,7 @@
-from tkinter import Tk, Button, Frame, StringVar
+from tkinter import Tk, Button, Frame, StringVar, filedialog
 from tkinter import *
 from tkinter.ttk import Combobox, Label, Treeview
 from auto_court_orders import Database
-from window_for_checking_and_sending_data import VALIDATION_AND_DATA_GENERATION_FUNCTION
 from tkcalendar import Calendar, DateEntry
 from tkinter.messagebox import showwarning
 
@@ -13,6 +12,7 @@ root.geometry("1000x600") #SIZE PROGRAM
 #LOCATION CONFIGURATION
 for c in range(3): root.columnconfigure(index=c, weight=1)
 for r in range(3): root.rowconfigure(index=r, weight=0)
+
 
 #THIS FUNCTION IS RESPONSIBLE FOR ASSIGNING VALUES TO THE RIGHT SIDE OF THE APPLICATION
 def ASSIGNING_VALUES_TO_VARIABLES_ON_THE_RIGHT_SIDE(event):
@@ -91,6 +91,78 @@ def ENTER_DATA_IN_THE_TABLE(*args):
                     TABLE_PARAMETERS.insert("", END, values=person)
             else:
                 return showwarning(title="Ошибка", message="Вы неверно заполнили поле 'Дата рождения должника'")
+
+
+#FUNCTION OF CREATING A DATA CHECK WINDOW AND FORMING A JUDICIAL ACT
+def VALIDATION_AND_DATA_GENERATION_FUNCTION():
+
+    window = Tk()
+    window.title("Проверьте введенные данные:")
+    window.geometry("500x300")
+
+    DATA_VERIFICATION_LABEL = Label(window, text="Проверьте введенные данные:", font=("Arial", 10))
+    DATA_VERIFICATION_LABEL.grid(row=0, column=0)
+
+    DEBTORS_ADDRESS_VERIFICATION_LABEL = Label(window, text="Адрес должника(-ов):", font=("Arial", 10))
+    DEBTORS_ADDRESS_VERIFICATION_LABEL.grid(row=1, column=0)
+
+    DEBTOR_STREET_LABEL = Label(window, text="ул." + BOX_HOUSE.get(), font=("Arial", 10))
+    DEBTOR_STREET_LABEL.grid(row=1, column=1)
+
+    DEBTOR_HOUSE_NUMBER_LABEL = Label(window, text="д." + BOX_NUMBER.get(), font=("Arial", 10))
+    DEBTOR_HOUSE_NUMBER_LABEL.grid(row=1, column=2)
+
+    DEBTOR_APARTMENT_NUMBER_LABEL = Label(window, text="кв." + APARTMENT_NUMBER_LABEL.get(), font=("Arial", 10))
+    DEBTOR_APARTMENT_NUMBER_LABEL.grid(row=1, column=3)
+
+    AMOUNT_OWED_LABEL = Label(window, text="Сумма задолженности: " + DEBTOR_DEBT_LABEL.get(), font=("Arial", 10))
+    AMOUNT_OWED_LABEL.grid(row=2, column=0)
+
+    WITHDRAWAL_OF_STATE_DUTY_LABEL = Label(window, text="Сумма гос.пошлины: " + result_of_the_fee_calculation.get(), font=("Arial", 10))
+    WITHDRAWAL_OF_STATE_DUTY_LABEL.grid(row=2, column=1)
+
+    DISPLAY_TOTAL_DEBT_LABEL = Label(window, text="Общая сумма задолженности: " + total_debt.get(), font=("Arial", 10))
+    DISPLAY_TOTAL_DEBT_LABEL.grid(row=3, column=0)
+
+    DISPLAYING_THE_PERIOD_OF_DEBTS_LABEL = Label(window, text=f'Период задолженности: c {BEGINNING_OF_PERIOD.get()} по {END_OF_PERIOD.get()}', font=("Arial", 10))
+    DISPLAYING_THE_PERIOD_OF_DEBTS_LABEL.grid(row=4, column=0)
+
+    DISPLAY_OF_DEBTORS_LABEL = Label(window, text="Должники", font=("Arial", 10))
+    DISPLAY_OF_DEBTORS_LABEL.grid(row=5, column=0)
+
+    OUTPUT_TABLE_LABEL = Label(window, text=general_list_of_debtors, font=("Arial", 10))
+    OUTPUT_TABLE_LABEL.grid(row=6, column=0)
+
+    def save_file():
+        filepath = filedialog.askdirectory()
+        NAME_OF_THE_SAVE_ACT_LABEL['text'] = filepath
+
+
+    BUTTON_SAVE_AS_LABEL = Button(window, text="Сохранить файл как", command=save_file)
+    BUTTON_SAVE_AS_LABEL.grid(row=7, column=0)
+
+    NAME_OF_THE_SAVE_ACT_LABEL = Label(window, text='')
+    NAME_OF_THE_SAVE_ACT_LABEL.grid(row=7, column=1)
+
+    TEXT_NAME_DEBTORS_LABEL = Label(window, text="Имя файла: ", font=("Arial", 10))
+    TEXT_NAME_DEBTORS_LABEL.grid(row=8, column=0)
+    print(BOX_HOUSE.get)
+    print(BOX_NUMBER.get)
+    print(APARTMENT_NUMBER_LABEL.get())
+
+    NAME_DEBTORS_LABEL = Entry(window)
+    NAME_DEBTORS_LABEL.insert(0, f'{TYPE_LIST_OF_HOUSE.get} {NUMBER_LIST_OF_HOUSE.get}-{APARTMENT_NUMBER_LABEL.get()}')
+    NAME_DEBTORS_LABEL.grid(row=8, column=1)
+
+
+
+
+
+
+
+
+
+
 
 
 ## BLOCKS ON THE LEFT
@@ -282,17 +354,16 @@ END_OF_PERIOD.grid(row=15, column=5)
 #GENERAL LIST OF DEBTORS AND DATA ABOUT THEM
 general_list_of_debtors = []
 
-
-#ZERO BLOCK FOR EMPTY FIELD
+# ZERO BLOCK FOR EMPTY FIELD
 ZERO_BLOCK = Label(text="", font=("Arial", 10))
 ZERO_BLOCK.grid(row=16, column=0)
 
-#TABLE CREATION BLOCK
+# TABLE CREATION BLOCK
 TABLE_HEADINGS = ("number", "name", "date_of_birth", "passport_data", "debtor_owner", "debtor_is_registered")
 TABLE_PARAMETERS = Treeview(columns=TABLE_HEADINGS, show="headings")
 TABLE_PARAMETERS.grid(row=17, column=0, sticky="nsew")
 
-#TABLE HEADING BLOCK
+# TABLE HEADING BLOCK
 TABLE_PARAMETERS.heading("number", text="№", anchor=W)
 TABLE_PARAMETERS.heading("name", text="ФИО должника", anchor=W)
 TABLE_PARAMETERS.heading("date_of_birth", text="Дата рождения должника", anchor=W)
@@ -309,7 +380,6 @@ TABLE_PARAMETERS.column("#6", stretch=NO, width=85)
 
 
 # КНОПКА ФОРМИРОВАНИЯ ПРИКАЗА
-
 btn = Button(text="СФОРМИРОВАТЬ ПРИКАЗ", command=VALIDATION_AND_DATA_GENERATION_FUNCTION)
 btn.grid(row=18, column=0)
 
