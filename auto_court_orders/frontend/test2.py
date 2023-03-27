@@ -16,6 +16,7 @@ for r in range(3): root.rowconfigure(index=r, weight=0)
 
 #THIS FUNCTION IS RESPONSIBLE FOR ASSIGNING VALUES TO THE RIGHT SIDE OF THE APPLICATION
 def ASSIGNING_VALUES_TO_VARIABLES_ON_THE_RIGHT_SIDE(event):
+    global VARIABLE_STREET, VARIABLE_NUMBER
     VARIABLE_STREET = BOX_HOUSE.get()
     VARIABLE_NUMBER = BOX_NUMBER.get()
     COMPANY_NAME_LABEL["text"] = f"{Database.NAME_OF_THE_CLAIMANT(VARIABLE_STREET, VARIABLE_NUMBER)}"
@@ -72,21 +73,29 @@ def ENTER_DATA_IN_THE_TABLE(*args):
                                                     PASSPORT_DATA_OF_THE_DEBTOR_LABEL.get(), '+', '+'))
                     list_for_a_new_debtor.append((len(general_list_of_debtors), DEBTORS_FULL_NAME_LABEL.get(), DEBTORS_DATE_OF_BIRTH_LABEL.get(),
                                                   PASSPORT_DATA_OF_THE_DEBTOR_LABEL.get(), '+', '+'))
+                    general_list_of_debtors_second_window.append([len(general_list_of_debtors), DEBTORS_FULL_NAME_LABEL.get(), DEBTORS_DATE_OF_BIRTH_LABEL.get(),
+                                                    PASSPORT_DATA_OF_THE_DEBTOR_LABEL.get()])
                 elif PROPERTY_CONFIRMATION_STR.get() == '1' and REGISTRATION_CHECK_STR.get() == '0':
                     general_list_of_debtors.append((len(general_list_of_debtors) + 1, DEBTORS_FULL_NAME_LABEL.get(), DEBTORS_DATE_OF_BIRTH_LABEL.get(),
                                                     PASSPORT_DATA_OF_THE_DEBTOR_LABEL.get(), '+', '-'))
                     list_for_a_new_debtor.append((len(general_list_of_debtors), DEBTORS_FULL_NAME_LABEL.get(), DEBTORS_DATE_OF_BIRTH_LABEL.get(),
                                                   PASSPORT_DATA_OF_THE_DEBTOR_LABEL.get(), '+', '-'))
+                    general_list_of_debtors_second_window.append([len(general_list_of_debtors), DEBTORS_FULL_NAME_LABEL.get(), DEBTORS_DATE_OF_BIRTH_LABEL.get(),
+                                                                 PASSPORT_DATA_OF_THE_DEBTOR_LABEL.get()])
                 elif PROPERTY_CONFIRMATION_STR.get() == '0' and REGISTRATION_CHECK_STR.get() == '1':
                     general_list_of_debtors.append((len(general_list_of_debtors) + 1, DEBTORS_FULL_NAME_LABEL.get(), DEBTORS_DATE_OF_BIRTH_LABEL.get(),
                                                     PASSPORT_DATA_OF_THE_DEBTOR_LABEL.get(), '-', '+'))
                     list_for_a_new_debtor.append((len(general_list_of_debtors), DEBTORS_FULL_NAME_LABEL.get(), DEBTORS_DATE_OF_BIRTH_LABEL.get(),
                                                   PASSPORT_DATA_OF_THE_DEBTOR_LABEL.get(), '-', '+'))
+                    general_list_of_debtors_second_window.append([len(general_list_of_debtors), DEBTORS_FULL_NAME_LABEL.get(), DEBTORS_DATE_OF_BIRTH_LABEL.get(),
+                                                                 PASSPORT_DATA_OF_THE_DEBTOR_LABEL.get()])
                 elif PROPERTY_CONFIRMATION_STR.get() == '0' and REGISTRATION_CHECK_STR.get() == '0':
                     general_list_of_debtors.append((len(general_list_of_debtors) + 1, DEBTORS_FULL_NAME_LABEL.get(), DEBTORS_DATE_OF_BIRTH_LABEL.get(),
                                                     PASSPORT_DATA_OF_THE_DEBTOR_LABEL.get(), '-', '-'))
                     list_for_a_new_debtor.append((len(general_list_of_debtors), DEBTORS_FULL_NAME_LABEL.get(), DEBTORS_DATE_OF_BIRTH_LABEL.get(),
                                                   PASSPORT_DATA_OF_THE_DEBTOR_LABEL.get(), '-', '-'))
+                    general_list_of_debtors_second_window.append([len(general_list_of_debtors), DEBTORS_FULL_NAME_LABEL.get(), DEBTORS_DATE_OF_BIRTH_LABEL.get(),
+                                                                 PASSPORT_DATA_OF_THE_DEBTOR_LABEL.get()])
                 for person in list_for_a_new_debtor:
                     TABLE_PARAMETERS.insert("", END, values=person)
             else:
@@ -130,8 +139,11 @@ def VALIDATION_AND_DATA_GENERATION_FUNCTION():
     DISPLAY_OF_DEBTORS_LABEL = Label(window, text="Должники", font=("Arial", 10))
     DISPLAY_OF_DEBTORS_LABEL.grid(row=5, column=0)
 
-    OUTPUT_TABLE_LABEL = Label(window, text=general_list_of_debtors, font=("Arial", 10))
-    OUTPUT_TABLE_LABEL.grid(row=6, column=0)
+    counter_t = 0
+    for i in general_list_of_debtors_second_window:
+        OUTPUT_TABLE_LABEL = Label(window, text=i, font=("Arial", 10))
+        OUTPUT_TABLE_LABEL.grid(row=6+counter_t, column=0)
+        counter_t+=1
 
     def save_file():
         filepath = filedialog.askdirectory()
@@ -139,20 +151,17 @@ def VALIDATION_AND_DATA_GENERATION_FUNCTION():
 
 
     BUTTON_SAVE_AS_LABEL = Button(window, text="Сохранить файл как", command=save_file)
-    BUTTON_SAVE_AS_LABEL.grid(row=7, column=0)
+    BUTTON_SAVE_AS_LABEL.grid(row=7+counter_t, column=0)
 
     NAME_OF_THE_SAVE_ACT_LABEL = Label(window, text='')
-    NAME_OF_THE_SAVE_ACT_LABEL.grid(row=7, column=1)
+    NAME_OF_THE_SAVE_ACT_LABEL.grid(row=7+counter_t, column=1)
 
     TEXT_NAME_DEBTORS_LABEL = Label(window, text="Имя файла: ", font=("Arial", 10))
-    TEXT_NAME_DEBTORS_LABEL.grid(row=8, column=0)
-    print(BOX_HOUSE.get)
-    print(BOX_NUMBER.get)
-    print(APARTMENT_NUMBER_LABEL.get())
+    TEXT_NAME_DEBTORS_LABEL.grid(row=8+counter_t, column=0)
 
     NAME_DEBTORS_LABEL = Entry(window)
-    NAME_DEBTORS_LABEL.insert(0, f'{TYPE_LIST_OF_HOUSE.get} {NUMBER_LIST_OF_HOUSE.get}-{APARTMENT_NUMBER_LABEL.get()}')
-    NAME_DEBTORS_LABEL.grid(row=8, column=1)
+    NAME_DEBTORS_LABEL.insert(0, f'{VARIABLE_STREET} {VARIABLE_NUMBER}-{APARTMENT_NUMBER_LABEL.get()}')
+    NAME_DEBTORS_LABEL.grid(row=8+counter_t, column=1)
 
 
 
@@ -353,6 +362,7 @@ END_OF_PERIOD.grid(row=15, column=5)
 
 #GENERAL LIST OF DEBTORS AND DATA ABOUT THEM
 general_list_of_debtors = []
+general_list_of_debtors_second_window = []
 
 # ZERO BLOCK FOR EMPTY FIELD
 ZERO_BLOCK = Label(text="", font=("Arial", 10))
