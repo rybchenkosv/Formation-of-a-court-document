@@ -195,6 +195,8 @@ def VALIDATION_AND_DATA_GENERATION_FUNCTION():
 
     def gg():
         print(NAME_DEBTORS_LABEL.get())
+        print(general_list_of_debtors_second_window)
+        print(general_list_of_debtors)
 
     SENDING_FILES_TO_A_DOC_LABEL = Button(window, text="ОТПРАВИТЬ", command=gg)
     SENDING_FILES_TO_A_DOC_LABEL.grid(row=9 + counter_t, column=0)
