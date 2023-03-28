@@ -16,6 +16,11 @@ root.geometry("1000x750")  # SIZE PROGRAM
 for c in range(3): root.columnconfigure(index=c, weight=1)
 for r in range(3): root.rowconfigure(index=r, weight=0)
 
+def delete():
+    selection = TABLE_PARAMETERS.selection()[0]
+    TABLE_PARAMETERS.delete(selection)
+
+
 
 # THIS FUNCTION IS RESPONSIBLE FOR ASSIGNING VALUES TO THE RIGHT SIDE OF THE APPLICATION
 def ASSIGNING_VALUES_TO_VARIABLES_ON_THE_RIGHT_SIDE(event):
@@ -75,11 +80,21 @@ def ENTER_DATA_IN_THE_TABLE(*args):
         return showwarning(title="Ошибка",
                            message="Вы не указали данные о том, является ли Должник собственником или прописанным")
     else:
-        if DEBTORS_FULL_NAME_LABEL.get() == '' or DEBTORS_DATE_OF_BIRTH_LABEL.get() == '' or PASSPORT_DATA_OF_THE_DEBTOR_LABEL.get() == '':
+        if DEBTORS_FULL_NAME_LABEL.get() == '' or DEBTORS_DATE_OF_BIRTH_LABEL.get() == '':
             return showwarning(title="Ошибка", message="Заполните все поля")
         else:
             if date_of_birth_check_variable == 'Yes':
-                if PROPERTY_CONFIRMATION_STR.get() == '1' and REGISTRATION_CHECK_STR.get() == '1':  # CHECKING WHETHER THE DEBTOR IS OWNER OR REGISTERED
+                if PROPERTY_CONFIRMATION_STR.get() == '1' and REGISTRATION_CHECK_STR.get() == '1' and PASSPORT_DATA_OF_THE_DEBTOR_LABEL.get() == '':  # CHECKING WHETHER THE DEBTOR IS OWNER OR REGISTERED
+                    general_list_of_debtors.append((len(general_list_of_debtors) + 1, DEBTORS_FULL_NAME_LABEL.get(),
+                                                    DEBTORS_DATE_OF_BIRTH_LABEL.get(),
+                                                    'п.д. отсутствуют', '+', '+'))
+                    list_for_a_new_debtor.append(
+                        (len(general_list_of_debtors), DEBTORS_FULL_NAME_LABEL.get(), DEBTORS_DATE_OF_BIRTH_LABEL.get(),
+                         'п.д. отсутствуют', '+', '+'))
+                    general_list_of_debtors_second_window.append(
+                        [len(general_list_of_debtors), DEBTORS_FULL_NAME_LABEL.get(), DEBTORS_DATE_OF_BIRTH_LABEL.get(),
+                         'п.д. отсутствуют'])
+                elif PROPERTY_CONFIRMATION_STR.get() == '1' and REGISTRATION_CHECK_STR.get() == '1' and PASSPORT_DATA_OF_THE_DEBTOR_LABEL.get() != '':  # CHECKING WHETHER THE DEBTOR IS OWNER OR REGISTERED
                     general_list_of_debtors.append((len(general_list_of_debtors) + 1, DEBTORS_FULL_NAME_LABEL.get(),
                                                     DEBTORS_DATE_OF_BIRTH_LABEL.get(),
                                                     PASSPORT_DATA_OF_THE_DEBTOR_LABEL.get(), '+', '+'))
@@ -89,7 +104,17 @@ def ENTER_DATA_IN_THE_TABLE(*args):
                     general_list_of_debtors_second_window.append(
                         [len(general_list_of_debtors), DEBTORS_FULL_NAME_LABEL.get(), DEBTORS_DATE_OF_BIRTH_LABEL.get(),
                          PASSPORT_DATA_OF_THE_DEBTOR_LABEL.get()])
-                elif PROPERTY_CONFIRMATION_STR.get() == '1' and REGISTRATION_CHECK_STR.get() == '0':
+                elif PROPERTY_CONFIRMATION_STR.get() == '1' and REGISTRATION_CHECK_STR.get() == '0' and PASSPORT_DATA_OF_THE_DEBTOR_LABEL.get() == '':
+                    general_list_of_debtors.append((len(general_list_of_debtors) + 1, DEBTORS_FULL_NAME_LABEL.get(),
+                                                    DEBTORS_DATE_OF_BIRTH_LABEL.get(),
+                                                    'п.д. отсутствуют', '+', '-'))
+                    list_for_a_new_debtor.append(
+                        (len(general_list_of_debtors), DEBTORS_FULL_NAME_LABEL.get(), DEBTORS_DATE_OF_BIRTH_LABEL.get(),
+                         'п.д. отсутствуют', '+', '-'))
+                    general_list_of_debtors_second_window.append(
+                        [len(general_list_of_debtors), DEBTORS_FULL_NAME_LABEL.get(), DEBTORS_DATE_OF_BIRTH_LABEL.get(),
+                         'п.д. отсутствуют'])
+                elif PROPERTY_CONFIRMATION_STR.get() == '1' and REGISTRATION_CHECK_STR.get() == '0' and PASSPORT_DATA_OF_THE_DEBTOR_LABEL.get() != '':
                     general_list_of_debtors.append((len(general_list_of_debtors) + 1, DEBTORS_FULL_NAME_LABEL.get(),
                                                     DEBTORS_DATE_OF_BIRTH_LABEL.get(),
                                                     PASSPORT_DATA_OF_THE_DEBTOR_LABEL.get(), '+', '-'))
@@ -99,7 +124,17 @@ def ENTER_DATA_IN_THE_TABLE(*args):
                     general_list_of_debtors_second_window.append(
                         [len(general_list_of_debtors), DEBTORS_FULL_NAME_LABEL.get(), DEBTORS_DATE_OF_BIRTH_LABEL.get(),
                          PASSPORT_DATA_OF_THE_DEBTOR_LABEL.get()])
-                elif PROPERTY_CONFIRMATION_STR.get() == '0' and REGISTRATION_CHECK_STR.get() == '1':
+                elif PROPERTY_CONFIRMATION_STR.get() == '0' and REGISTRATION_CHECK_STR.get() == '1' and PASSPORT_DATA_OF_THE_DEBTOR_LABEL.get() == '':
+                    general_list_of_debtors.append((len(general_list_of_debtors) + 1, DEBTORS_FULL_NAME_LABEL.get(),
+                                                    DEBTORS_DATE_OF_BIRTH_LABEL.get(),
+                                                    'п.д. отсутствуют', '-', '+'))
+                    list_for_a_new_debtor.append(
+                        (len(general_list_of_debtors), DEBTORS_FULL_NAME_LABEL.get(), DEBTORS_DATE_OF_BIRTH_LABEL.get(),
+                         'п.д. отсутствуют', '-', '+'))
+                    general_list_of_debtors_second_window.append(
+                        [len(general_list_of_debtors), DEBTORS_FULL_NAME_LABEL.get(), DEBTORS_DATE_OF_BIRTH_LABEL.get(),
+                         'п.д. отсутствуют'])
+                elif PROPERTY_CONFIRMATION_STR.get() == '0' and REGISTRATION_CHECK_STR.get() == '1' and PASSPORT_DATA_OF_THE_DEBTOR_LABEL.get() != '':
                     general_list_of_debtors.append((len(general_list_of_debtors) + 1, DEBTORS_FULL_NAME_LABEL.get(),
                                                     DEBTORS_DATE_OF_BIRTH_LABEL.get(),
                                                     PASSPORT_DATA_OF_THE_DEBTOR_LABEL.get(), '-', '+'))
@@ -109,7 +144,7 @@ def ENTER_DATA_IN_THE_TABLE(*args):
                     general_list_of_debtors_second_window.append(
                         [len(general_list_of_debtors), DEBTORS_FULL_NAME_LABEL.get(), DEBTORS_DATE_OF_BIRTH_LABEL.get(),
                          PASSPORT_DATA_OF_THE_DEBTOR_LABEL.get()])
-                elif PROPERTY_CONFIRMATION_STR.get() == '0' and REGISTRATION_CHECK_STR.get() == '0':
+                elif PROPERTY_CONFIRMATION_STR.get() == '0' and REGISTRATION_CHECK_STR.get() == '0'and PASSPORT_DATA_OF_THE_DEBTOR_LABEL.get() != '':
                     general_list_of_debtors.append((len(general_list_of_debtors) + 1, DEBTORS_FULL_NAME_LABEL.get(),
                                                     DEBTORS_DATE_OF_BIRTH_LABEL.get(),
                                                     PASSPORT_DATA_OF_THE_DEBTOR_LABEL.get(), '-', '-'))
@@ -119,6 +154,16 @@ def ENTER_DATA_IN_THE_TABLE(*args):
                     general_list_of_debtors_second_window.append(
                         [len(general_list_of_debtors), DEBTORS_FULL_NAME_LABEL.get(), DEBTORS_DATE_OF_BIRTH_LABEL.get(),
                          PASSPORT_DATA_OF_THE_DEBTOR_LABEL.get()])
+                elif PROPERTY_CONFIRMATION_STR.get() == '0' and REGISTRATION_CHECK_STR.get() == '0'and PASSPORT_DATA_OF_THE_DEBTOR_LABEL.get() == '':
+                    general_list_of_debtors.append((len(general_list_of_debtors) + 1, DEBTORS_FULL_NAME_LABEL.get(),
+                                                    DEBTORS_DATE_OF_BIRTH_LABEL.get(),
+                                                    'п.д. отсутствуют', '-', '-'))
+                    list_for_a_new_debtor.append(
+                        (len(general_list_of_debtors), DEBTORS_FULL_NAME_LABEL.get(), DEBTORS_DATE_OF_BIRTH_LABEL.get(),
+                         'п.д. отсутствуют', '-', '-'))
+                    general_list_of_debtors_second_window.append(
+                        [len(general_list_of_debtors), DEBTORS_FULL_NAME_LABEL.get(), DEBTORS_DATE_OF_BIRTH_LABEL.get(),
+                         'п.д. отсутствуют'])
                 for person in list_for_a_new_debtor:
                     TABLE_PARAMETERS.insert("", END, values=person)
             else:
@@ -177,7 +222,7 @@ def VALIDATION_AND_DATA_GENERATION_FUNCTION():
     NAME_OF_THE_SAVE_ACT_LABEL = Label(window, text='')
     NAME_OF_THE_SAVE_ACT_LABEL.grid(row=13 + counter_t, column=0, sticky=W, padx=10)
 
-    TEXT_NAME_DEBTORS_LABEL = Label(window, text="Сохранить файл как: ", font=("Arial", 10))
+    TEXT_NAME_DEBTORS_LABEL = Label(window, text="Сохранить файл как: ", font=("Arial", 10, 'bold'))
     TEXT_NAME_DEBTORS_LABEL.grid(row=10 + counter_t, column=0, sticky=W, padx=10)
 
     NAME_DEBTORS_LABEL = Entry(window)
@@ -378,9 +423,13 @@ REGISTRATION_CHECK = REGISTRATION_CHECK_STR.get()  # ПОКА ПУСТОЕ ПР�
 BUTTON_ADD_DEBTOR = Button(text="Добавить должника", font=("Arial", 8,'bold'), command=ENTER_DATA_IN_THE_TABLE, bg='#79abfc')
 BUTTON_ADD_DEBTOR.grid(row=16, column=0, sticky=NS)
 
+###
+hhh1 = Button(text="Удалить из списка", font=("Arial", 8,'bold'), bg='#f54c4c', command=delete)
+hhh1.grid(row=17, column=0, sticky=NS, pady=5)
+
 ####
 hhh = Button(text="Очистить данные", font=("Arial", 8,'bold'))
-hhh.grid(row=17, column=0, sticky=NS, pady=5)
+hhh.grid(row=18, column=0, sticky=NS, pady=5)
 
 
 ## BLOCKS ON THE RIGHT
@@ -484,7 +533,7 @@ ZERO_BLOCK.grid()
 # TABLE CREATION BLOCK
 TABLE_HEADINGS = ("number", "name", "date_of_birth", "passport_data", "debtor_owner", "debtor_is_registered")
 TABLE_PARAMETERS = Treeview(columns=TABLE_HEADINGS, show="headings")
-TABLE_PARAMETERS.grid(columnspan=5)
+TABLE_PARAMETERS.grid(columnspan=3)
 
 # TABLE HEADING BLOCK
 TABLE_PARAMETERS.heading("number", text="№")
@@ -512,6 +561,7 @@ btn1.grid(row=3, column=2, rowspan=2)
 ###
 btn2 = Button(text="ДОБАВИТЬ В РЕЕСТР НА \nПОДАЧУ В МИРОВОЙ СУД", font=("Arial", 8,'bold'))
 btn2.grid(row=5, column=2, rowspan=2)
+
 
 root.iconbitmap('icon.ico')
 root.mainloop()
