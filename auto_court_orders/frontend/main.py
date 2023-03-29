@@ -1,9 +1,9 @@
 from tkinter import Tk, Button, Frame, StringVar, filedialog
 from tkinter import *
-from tkinter.ttk import Combobox, Label, Treeview, Notebook
+from tkinter.ttk import Combobox, Label, Treeview, Notebook, Scrollbar
 from auto_court_orders import Database
 from tkcalendar import Calendar, DateEntry
-from tkinter.messagebox import showwarning
+from tkinter.messagebox import showwarning, showerror, showinfo, askyesno
 from docxtpl import DocxTemplate
 from ttkthemes import ThemedTk
 
@@ -12,20 +12,91 @@ root = ThemedTk(theme="breeze")
 root.title("Формирование судебного приказа в мировой суд")  # THE DISPLAYED NAME OF THE PROGRAM
 root.geometry("870x750")  # SIZE PROGRAM
 
+
 # LOCATION CONFIGURATION
 for c in range(20): root.columnconfigure(index=c, weight=1)
 for r in range(3): root.rowconfigure(index=r, weight=1)
 
+# GENERAL LIST OF DEBTORS AND DATA ABOUT THEM
+general_list_of_debtors = []
+general_list_of_debtors_second_window = []
+
 LIST_OF_EXCLUDED_DEBTORS_NUMBERS = []
+all_del = []
+
+# STATE FEE LIST AND COURT FILE LISTS
+LIST_OF_THE_REGISTER_OF_THE_STATE_DUTY = []
+LIST_OF_DEBTORS_FOR_THE_COURT = []
+
+# REGISTRY WINDOW FUNCTIONS
+
+def STATE_DUTY_REGISTRY_WINDOW_FUNCTIONS():
+    state_duty_register_generation_window = ThemedTk(theme="breeze")
+    state_duty_register_generation_window.title("Реестр на подачу госпошлины")
+    state_duty_register_generation_window.geometry("900x500")
+    state_duty_register_generation_window.iconbitmap('icon.ico')
+
+    def save_file():
+        filepath = filedialog.askdirectory()
+        NAME_OF_THE_SAVE_ACT_LABEL['text'] = filepath
+
+    # TABLE CREATION BLOCK
+    TABLE_HEADINGS_register = ("number", "address", "name", "amount_of_state_duty", "management_company")
+    TABLE_PARAMETERS_register = Treeview(state_duty_register_generation_window, columns=TABLE_HEADINGS_register, show="headings")
+    TABLE_PARAMETERS_register.grid(columnspan=3)
+
+    # TABLE HEADING BLOCK
+    TABLE_PARAMETERS_register.heading("number", text="№")
+    TABLE_PARAMETERS_register.heading("address", text="Адрес")
+    TABLE_PARAMETERS_register.heading("name", text="ФИО должника")
+    TABLE_PARAMETERS_register.heading("amount_of_state_duty", text="Сумма гос.пошлины")
+    TABLE_PARAMETERS_register.heading("management_company", text="Управляющая компания")
+
+    TABLE_PARAMETERS_register.column("#1", stretch=NO, width=50)
+    TABLE_PARAMETERS_register.column("#2", stretch=NO, width=200)
+    TABLE_PARAMETERS_register.column("#3", stretch=NO, width=200)
+    TABLE_PARAMETERS_register.column("#4", stretch=NO, width=150)
+    TABLE_PARAMETERS_register.column("#5", stretch=NO, width=150)
+
+    # добавляем вертикальную прокрутку
+    scrollbar = Scrollbar(orient=VERTICAL, command=TABLE_PARAMETERS_register.yview)
+    TABLE_PARAMETERS_register.configure(yscroll=scrollbar.set)
+    scrollbar.grid()
+
+    BUTTON_SAVE_AS_LABEL = Button(state_duty_register_generation_window, text="Путь сохранения", font=("Arial", 10, 'bold'), command=save_file)
+    BUTTON_SAVE_AS_LABEL.grid()
+
+    NAME_OF_THE_SAVE_ACT_LABEL = Label(state_duty_register_generation_window, text='')
+    NAME_OF_THE_SAVE_ACT_LABEL.grid()
+
+    TEXT_NAME_DEBTORS_LABEL = Label(state_duty_register_generation_window, text="Сохранить файл как: ", font=("Arial", 10, 'bold'))
+    TEXT_NAME_DEBTORS_LABEL.grid()
+
+    NAME_DEBTORS_LABEL = Entry(state_duty_register_generation_window)
+    NAME_DEBTORS_LABEL.insert(0, f'{VARIABLE_STREET} {VARIABLE_NUMBER}-{APARTMENT_NUMBER_LABEL.get()}')
+    NAME_DEBTORS_LABEL.grid()
+
+def REGISTRY_WINDOW_FUNCTION_TO_COURT():
+    window_for_the_formation_of_the_registry_to_the_court = ThemedTk(theme="breeze")
+    window_for_the_formation_of_the_registry_to_the_court.title("Реестр на подачу в мировой суд")
+    window_for_the_formation_of_the_registry_to_the_court.geometry("500x300")
+    window_for_the_formation_of_the_registry_to_the_court.iconbitmap('icon.ico')
+
 
 # COLLECTION FUNCTION LIST OF EXCLUDED DEBTORS NUMBERS
 def delete():
     selection = TABLE_PARAMETERS.selection()[0]
     TABLE_PARAMETERS.delete(selection)
     LIST_OF_EXCLUDED_DEBTORS_NUMBERS.append(selection[3:])
+    print(selection)
 
+# LISTING FUNCTION OF ALL REMOTE
 def CLEAR_ALL_DATA_FROM_TABLE():
-    pass
+    s = TABLE_PARAMETERS.get_children()
+    for i in s:
+        all_del.append(i[3:])
+        TABLE_PARAMETERS.delete(i)
+
 
 # THIS FUNCTION IS RESPONSIBLE FOR ASSIGNING VALUES TO THE RIGHT SIDE OF THE APPLICATION
 def ASSIGNING_VALUES_TO_VARIABLES_ON_THE_RIGHT_SIDE(event):
@@ -175,6 +246,7 @@ def ENTER_DATA_IN_THE_TABLE(*args):
                 return showwarning(title="Ошибка", message="Вы неверно заполнили поле 'Дата рождения должника'")
 
 
+
 # FUNCTION OF CREATING A DATA CHECK WINDOW AND FORMING A JUDICIAL ACT
 def VALIDATION_AND_DATA_GENERATION_FUNCTION():
     window = ThemedTk(theme="breeze")
@@ -183,6 +255,9 @@ def VALIDATION_AND_DATA_GENERATION_FUNCTION():
     window.iconbitmap('icon.ico')
 
     # WE FORM LISTS OF DEBTORS WITHOUT DELETES FOR DISPLAY IN THE CONFIRMATION WINDOW AND SEND TO DOC
+    for i in set(all_del + LIST_OF_EXCLUDED_DEBTORS_NUMBERS): # ADD TO THE LIST OF DELETES A LIST OF ALL DELETES
+        if str(i) not in LIST_OF_EXCLUDED_DEBTORS_NUMBERS:
+            LIST_OF_EXCLUDED_DEBTORS_NUMBERS.append(str(i))
     FIRST_LIST_OF_DEBTORS_EXCEPT_EXCLUDED = []
     SECOND_LIST_OF_DEBTORS_EXCEPT_EXCLUDED = []
     for i in general_list_of_debtors_second_window:
@@ -347,6 +422,45 @@ def VALIDATION_AND_DATA_GENERATION_FUNCTION():
     # BUTTON FOR SENDING GENERATED DATA TO THE FUNCTION OF AUTOMATIC GENERATION AND SAVING DATA
     SENDING_FILES_TO_A_DOC_LABEL = Button(window, text="ОТПРАВИТЬ", font=("Arial", 10,'bold'), command=TEXT_DOCUMENT, bg='#79abfc')
     SENDING_FILES_TO_A_DOC_LABEL.grid(row=14 + counter_t, column=0, sticky=W, padx=10)
+
+
+# FUNCTION OF ADDING DATA TO THE LIST OF PAYMENT OF THE STATE DUTY
+def THE_FUNCTION_OF_FORMING_THE_REGISTER_FOR_THE_PAYMENT_OF_THE_STATE_FEE():
+    if len(general_list_of_debtors) == 0:
+        showerror(title="Ошибка", message="Вы не добавили ни одного должника!")
+    else:
+        if APARTMENT_NUMBER_LABEL.get() == '' or VARIABLE_STREET == '' or VARIABLE_NUMBER == '':
+            showerror(title="Ошибка", message="Вы не указали адрес должника!")
+        else:
+            if result_of_the_fee_calculation.get() == '' or result_of_the_fee_calculation.get() == 'Сумма введена некорректно':
+                showerror(title="Ошибка", message="Укажите сумму задолженности!")
+            else:
+                p = [f'{VARIABLE_STREET}, {VARIABLE_NUMBER}-{APARTMENT_NUMBER_LABEL.get()}',general_list_of_debtors[0][1], result_of_the_fee_calculation.get(), COMPANY_NAME_LABEL["text"]]
+                LIST_OF_THE_REGISTER_OF_THE_STATE_DUTY.append(p)
+                showinfo(title="Информация", message=f'В реестр добавлен {general_list_of_debtors[0][1]}')
+
+def THE_FUNCTION_OF_FORMING_A_LIST_OF_DEBTORS_FOR_THE_COURT():
+    if len(general_list_of_debtors) == 0:
+        showerror(title="Ошибка", message="Вы не добавили ни одного должника!")
+    else:
+        if APARTMENT_NUMBER_LABEL.get() == '' or VARIABLE_STREET == '' or VARIABLE_NUMBER == '':
+            showerror(title="Ошибка", message="Вы не указали адрес должника!")
+        else:
+            if result_of_the_fee_calculation.get() == '' or result_of_the_fee_calculation.get() == 'Сумма введена некорректно':
+                showerror(title="Ошибка", message="Укажите сумму задолженности!")
+            else:
+                confirmation_of_the_number_of_debtors = askyesno(title="Подтвержение операции", message="Вы добавили всех должников?")
+                if confirmation_of_the_number_of_debtors:
+                    showinfo("Результат", "Операция подтверждена")
+                    s = ''
+                    for i in range(len(general_list_of_debtors)):
+                        s+= general_list_of_debtors[i][1]
+                        if i+1 != len(general_list_of_debtors):
+                            s+= ', '
+                    p = [f'{VARIABLE_STREET}, {VARIABLE_NUMBER}-{APARTMENT_NUMBER_LABEL.get()}', s, JUDICIAL_SECTION_LABEL["text"], COMPANY_NAME_LABEL["text"]]
+                    LIST_OF_DEBTORS_FOR_THE_COURT.append(p)
+                    print(LIST_OF_DEBTORS_FOR_THE_COURT)
+                    showinfo("Информация", f"В реестр добавлены: {s}")
 
 
 ## BLOCKS ON THE LEFT
@@ -542,10 +656,6 @@ END_OF_PERIOD.grid(row=18, column=1, sticky=NS)
 # CENTRAL BLOCK
 # TABLE
 
-# GENERAL LIST OF DEBTORS AND DATA ABOUT THEM
-general_list_of_debtors = []
-general_list_of_debtors_second_window = []
-
 # ZERO BLOCK FOR EMPTY FIELD
 ZERO_BLOCK = Label(text="", font=("Arial", 10))
 ZERO_BLOCK.grid()
@@ -573,12 +683,20 @@ DATA_CHECK_BUTTON = Button(text="СФОРМИРОВАТЬ ПРИКАЗ", font=("
 DATA_CHECK_BUTTON.grid(row=2, column=2)
 
 # BUTTON FOR SENDING DEBTORS TO THE LIST FOR PAYMENT OF STATE DUTIES
-BUTTON_PAYMENT_OF_STATE_DUTIES = Button(text="ДОБАВИТЬ В РЕЕСТР НА \nПОДАЧУ ГОСПОШЛИНЫ", font=("Arial", 8,'bold'))
+BUTTON_PAYMENT_OF_STATE_DUTIES = Button(text="ДОБАВИТЬ В РЕЕСТР НА \nПОДАЧУ ГОСПОШЛИНЫ", font=("Arial", 8,'bold'), bg='#79abfc', command=THE_FUNCTION_OF_FORMING_THE_REGISTER_FOR_THE_PAYMENT_OF_THE_STATE_FEE)
 BUTTON_PAYMENT_OF_STATE_DUTIES.grid(row=3, column=2, rowspan=2)
 
 # BUTTON FOR SENDING DEBTORS TO THE LIST TO SEND TO COURT
-BUTTON_SEND_TO_COURT = Button(text="ДОБАВИТЬ В РЕЕСТР НА \nПОДАЧУ В МИРОВОЙ СУД", font=("Arial", 8,'bold'))
+BUTTON_SEND_TO_COURT = Button(text="ДОБАВИТЬ В РЕЕСТР НА \nПОДАЧУ В МИРОВОЙ СУД", font=("Arial", 8,'bold'), bg='#79abfc', command=THE_FUNCTION_OF_FORMING_A_LIST_OF_DEBTORS_FOR_THE_COURT)
 BUTTON_SEND_TO_COURT.grid(row=5, column=2, rowspan=2)
+
+#####
+asasas = Button(text="РЕЕСТР НА ПОДАЧУ \nГОСПОШЛИНЫ", font=("Arial", 8,'bold'), command=STATE_DUTY_REGISTRY_WINDOW_FUNCTIONS)
+asasas.grid(row=14, column=2, rowspan=2)
+
+#####
+asasas1 = Button(text="РЕЕСТР НА ПОДАЧУ \nВ МИРОВОЙ СУД", font=("Arial", 8,'bold'), command=REGISTRY_WINDOW_FUNCTION_TO_COURT)
+asasas1.grid(row=16, column=2, rowspan=2)
 
 
 root.resizable(False, False)
