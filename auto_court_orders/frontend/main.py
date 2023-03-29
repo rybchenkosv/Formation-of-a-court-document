@@ -7,20 +7,25 @@ from tkinter.messagebox import showwarning
 from docxtpl import DocxTemplate
 from ttkthemes import ThemedTk
 
-# = Tk()
+
 root = ThemedTk(theme="breeze")
 root.title("Формирование судебного приказа в мировой суд")  # THE DISPLAYED NAME OF THE PROGRAM
-root.geometry("1000x750")  # SIZE PROGRAM
+root.geometry("870x750")  # SIZE PROGRAM
 
 # LOCATION CONFIGURATION
-for c in range(3): root.columnconfigure(index=c, weight=1)
-for r in range(3): root.rowconfigure(index=r, weight=0)
+for c in range(20): root.columnconfigure(index=c, weight=1)
+for r in range(3): root.rowconfigure(index=r, weight=1)
 
+LIST_OF_EXCLUDED_DEBTORS_NUMBERS = []
+
+# COLLECTION FUNCTION LIST OF EXCLUDED DEBTORS NUMBERS
 def delete():
     selection = TABLE_PARAMETERS.selection()[0]
     TABLE_PARAMETERS.delete(selection)
+    LIST_OF_EXCLUDED_DEBTORS_NUMBERS.append(selection[3:])
 
-
+def CLEAR_ALL_DATA_FROM_TABLE():
+    pass
 
 # THIS FUNCTION IS RESPONSIBLE FOR ASSIGNING VALUES TO THE RIGHT SIDE OF THE APPLICATION
 def ASSIGNING_VALUES_TO_VARIABLES_ON_THE_RIGHT_SIDE(event):
@@ -165,7 +170,7 @@ def ENTER_DATA_IN_THE_TABLE(*args):
                         [len(general_list_of_debtors), DEBTORS_FULL_NAME_LABEL.get(), DEBTORS_DATE_OF_BIRTH_LABEL.get(),
                          'п.д. отсутствуют'])
                 for person in list_for_a_new_debtor:
-                    TABLE_PARAMETERS.insert("", END, values=person)
+                    TABLE_PARAMETERS.insert("", END, values=person[1:])
             else:
                 return showwarning(title="Ошибка", message="Вы неверно заполнили поле 'Дата рождения должника'")
 
@@ -176,6 +181,16 @@ def VALIDATION_AND_DATA_GENERATION_FUNCTION():
     window.title("Проверьте введенные данные")
     window.geometry("500x300")
     window.iconbitmap('icon.ico')
+
+    # WE FORM LISTS OF DEBTORS WITHOUT DELETES FOR DISPLAY IN THE CONFIRMATION WINDOW AND SEND TO DOC
+    FIRST_LIST_OF_DEBTORS_EXCEPT_EXCLUDED = []
+    SECOND_LIST_OF_DEBTORS_EXCEPT_EXCLUDED = []
+    for i in general_list_of_debtors_second_window:
+        if str(i[0]) not in LIST_OF_EXCLUDED_DEBTORS_NUMBERS:
+            FIRST_LIST_OF_DEBTORS_EXCEPT_EXCLUDED.append(i)
+    for i in general_list_of_debtors:
+        if str(i[0]) not in LIST_OF_EXCLUDED_DEBTORS_NUMBERS:
+            SECOND_LIST_OF_DEBTORS_EXCEPT_EXCLUDED.append(i)
 
     DATA_VERIFICATION_LABEL = Label(window, text="ПРОВЕРЬТЕ ВВЕДЕННЫЕ ДАННЫЕ:", font=("Arial", 10,'bold'))
     DATA_VERIFICATION_LABEL.grid(row=0, column=0, columnspan=4, padx=10)
@@ -204,8 +219,13 @@ def VALIDATION_AND_DATA_GENERATION_FUNCTION():
     DISPLAY_OF_DEBTORS_LABEL.grid(row=7, column=0, columnspan=4, padx=10)
 
     counter_t = 0
-    for i in general_list_of_debtors_second_window:
-        OUTPUT_TABLE_LABEL = Label(window, text=i, font=("Arial", 10))
+    for i in FIRST_LIST_OF_DEBTORS_EXCEPT_EXCLUDED:
+        # CREATING A STRING WITHOUT ADDITIONAL CHARACTERS
+        v_x = i[1:]
+        vv_x = ''
+        for j in v_x:
+            vv_x += j + ' '
+        OUTPUT_TABLE_LABEL = Label(window, text=vv_x, font=("Arial", 10))
         OUTPUT_TABLE_LABEL.grid(row=8 + counter_t, column=0, sticky=W, padx=10, columnspan=4)
         counter_t += 1
 
@@ -301,22 +321,22 @@ def VALIDATION_AND_DATA_GENERATION_FUNCTION():
         context = {'name_of_the_court': JUDICIAL_SECTION_LABEL["text"],  # TRANSFERRING COURT DATA
                    'claimant': COMPANY_NAME_LABEL["text"],  # TRANSFER OF CLAIMANTS
                    'address_claimant': COMPANY_ADDRESS_LABEL["text"],  # TRANSFER ADDRESS CLAIMANT
-                   'debtors': DOC_DATA_GENERATION_FUNCTION(general_list_of_debtors_second_window), # DEBTORS
+                   'debtors': DOC_DATA_GENERATION_FUNCTION(FIRST_LIST_OF_DEBTORS_EXCEPT_EXCLUDED), # DEBTORS
                    'variable_street': VARIABLE_STREET,  # TRANSFER OF THE DEBTOR'S ADDRESS
                    'variable_number': VARIABLE_NUMBER,  # TRANSFER OF THE HOUSE NUMBER OF THE DEBTOR
                    'apartment_variable_number': APARTMENT_NUMBER_LABEL.get(),  # TRANSFER OF THE APARTMENT NUMBER OF THE DEBTOR
                    'amount_debt': DEBTOR_DEBT_LABEL.get(),  # TRANSFER THE AMOUNT OF DEBT
                    'amount_state_fee': result_of_the_fee_calculation.get(),  # TRANSFER STATE DUTY
-                   'owners_of_debtors': FUNCTION_OF_COLLECTION_FROM_OWNERS_OF_DEBTORS(general_list_of_debtors), # DEBTORS IN LIST FORMAT
-                   'check': FUNCTION_TO_CHECK_REGISTERED_FOR_DOC(general_list_of_debtors),
+                   'owners_of_debtors': FUNCTION_OF_COLLECTION_FROM_OWNERS_OF_DEBTORS(SECOND_LIST_OF_DEBTORS_EXCEPT_EXCLUDED), # DEBTORS IN LIST FORMAT
+                   'check': FUNCTION_TO_CHECK_REGISTERED_FOR_DOC(SECOND_LIST_OF_DEBTORS_EXCEPT_EXCLUDED),
                    # FORMATION OF THE TEXT DEPENDING ON WHETHER THE REGISTERED DEBTORS
-                   'registered_debtors': FUNCTION_OF_COLLECTION_REGISTERED_DEBTORS(general_list_of_debtors), # LIST OF REGISTERED
+                   'registered_debtors': FUNCTION_OF_COLLECTION_REGISTERED_DEBTORS(SECOND_LIST_OF_DEBTORS_EXCEPT_EXCLUDED), # LIST OF REGISTERED
                    'management_start': MANAGEMENT_START_DATE_LABEL["text"],  # TRANSFER THE STARTING DATE OF MANAGEMENT
                    'debt_period': DEBT_PERIOD_FUNCTION(BEGINNING_OF_PERIOD.get(), END_OF_PERIOD.get()), # DEBT PERIOD
                    'total_debt': total_debt.get(),  # TRANSFER TOTAL DEBT
-                   'check_quantity': FUNCTION_TO_CHECK_THE_NUMBER_OF_OBLIGERS_FOR_DOC(general_list_of_debtors),
+                   'check_quantity': FUNCTION_TO_CHECK_THE_NUMBER_OF_OBLIGERS_FOR_DOC(SECOND_LIST_OF_DEBTORS_EXCEPT_EXCLUDED),
                    # FORMATION OF THE TEXT DEPENDING ON THE NUMBER OF DEBTORS
-                   'list_of_debtors': LIST_OF_DEBTORS_FUNCTION(general_list_of_debtors_second_window), # LIST OF DEBTORS
+                   'list_of_debtors': LIST_OF_DEBTORS_FUNCTION(FIRST_LIST_OF_DEBTORS_EXCEPT_EXCLUDED), # LIST OF DEBTORS
                    }
 
         save_folder_path = NAME_OF_THE_SAVE_ACT_LABEL['text'] # COMPUTER SAVE PATH VARIABLE
@@ -423,13 +443,13 @@ REGISTRATION_CHECK = REGISTRATION_CHECK_STR.get()  # ПОКА ПУСТОЕ ПР�
 BUTTON_ADD_DEBTOR = Button(text="Добавить должника", font=("Arial", 8,'bold'), command=ENTER_DATA_IN_THE_TABLE, bg='#79abfc')
 BUTTON_ADD_DEBTOR.grid(row=16, column=0, sticky=NS)
 
-###
-hhh1 = Button(text="Удалить из списка", font=("Arial", 8,'bold'), bg='#f54c4c', command=delete)
-hhh1.grid(row=17, column=0, sticky=NS, pady=5)
+# BUTTON FOR REMOVING A DEBTOR FROM THE LIST
+DELETE_BUTTON = Button(text="Удалить из списка", font=("Arial", 8,'bold'), bg='#f54c4c', command=delete)
+DELETE_BUTTON.grid(row=17, column=0, sticky=NS, pady=5)
 
-####
-hhh = Button(text="Очистить данные", font=("Arial", 8,'bold'))
-hhh.grid(row=18, column=0, sticky=NS, pady=5)
+# BUTTON TO REMOVE ALL DEBTORS FROM THE LIST
+BUTTON_DELETE_ALL_DEBTORS = Button(text="Очистить данные", font=("Arial", 8,'bold'), command=CLEAR_ALL_DATA_FROM_TABLE)
+BUTTON_DELETE_ALL_DEBTORS.grid(row=18, column=0, sticky=NS, pady=5)
 
 
 ## BLOCKS ON THE RIGHT
@@ -531,37 +551,36 @@ ZERO_BLOCK = Label(text="", font=("Arial", 10))
 ZERO_BLOCK.grid()
 
 # TABLE CREATION BLOCK
-TABLE_HEADINGS = ("number", "name", "date_of_birth", "passport_data", "debtor_owner", "debtor_is_registered")
+TABLE_HEADINGS = ("name", "date_of_birth", "passport_data", "debtor_owner", "debtor_is_registered")
 TABLE_PARAMETERS = Treeview(columns=TABLE_HEADINGS, show="headings")
-TABLE_PARAMETERS.grid(columnspan=3)
+TABLE_PARAMETERS.grid(row=20, column=0, columnspan=3)
 
 # TABLE HEADING BLOCK
-TABLE_PARAMETERS.heading("number", text="№")
 TABLE_PARAMETERS.heading("name", text="ФИО должника")
 TABLE_PARAMETERS.heading("date_of_birth", text="Дата рождения должника")
 TABLE_PARAMETERS.heading("passport_data", text="Паспортные данные должника")
 TABLE_PARAMETERS.heading("debtor_owner", text="Собственник")
 TABLE_PARAMETERS.heading("debtor_is_registered", text="Прописан")
 
-TABLE_PARAMETERS.column("#1", stretch=NO, width=25)
+TABLE_PARAMETERS.column("#1", stretch=NO, width=200)
 TABLE_PARAMETERS.column("#2", stretch=NO, width=200)
-TABLE_PARAMETERS.column("#3", stretch=NO, width=200)
-TABLE_PARAMETERS.column("#4", stretch=NO, width=300)
+TABLE_PARAMETERS.column("#3", stretch=NO, width=300)
+TABLE_PARAMETERS.column("#4", stretch=NO, width=85)
 TABLE_PARAMETERS.column("#5", stretch=NO, width=85)
-TABLE_PARAMETERS.column("#6", stretch=NO, width=85)
 
 # ORDER FORMATION BUTTON
-btn = Button(text="СФОРМИРОВАТЬ ПРИКАЗ", font=("Arial", 8,'bold'), command=VALIDATION_AND_DATA_GENERATION_FUNCTION, bg='#79abfc')
-btn.grid(row=2, column=2)
+DATA_CHECK_BUTTON = Button(text="СФОРМИРОВАТЬ ПРИКАЗ", font=("Arial", 8,'bold'), command=VALIDATION_AND_DATA_GENERATION_FUNCTION, bg='#79abfc')
+DATA_CHECK_BUTTON.grid(row=2, column=2)
 
-###
-btn1 = Button(text="ДОБАВИТЬ В РЕЕСТР НА \nПОДАЧУ ГОСПОШЛИНЫ", font=("Arial", 8,'bold'))
-btn1.grid(row=3, column=2, rowspan=2)
+# BUTTON FOR SENDING DEBTORS TO THE LIST FOR PAYMENT OF STATE DUTIES
+BUTTON_PAYMENT_OF_STATE_DUTIES = Button(text="ДОБАВИТЬ В РЕЕСТР НА \nПОДАЧУ ГОСПОШЛИНЫ", font=("Arial", 8,'bold'))
+BUTTON_PAYMENT_OF_STATE_DUTIES.grid(row=3, column=2, rowspan=2)
 
-###
-btn2 = Button(text="ДОБАВИТЬ В РЕЕСТР НА \nПОДАЧУ В МИРОВОЙ СУД", font=("Arial", 8,'bold'))
-btn2.grid(row=5, column=2, rowspan=2)
+# BUTTON FOR SENDING DEBTORS TO THE LIST TO SEND TO COURT
+BUTTON_SEND_TO_COURT = Button(text="ДОБАВИТЬ В РЕЕСТР НА \nПОДАЧУ В МИРОВОЙ СУД", font=("Arial", 8,'bold'))
+BUTTON_SEND_TO_COURT.grid(row=5, column=2, rowspan=2)
 
 
+root.resizable(False, False)
 root.iconbitmap('icon.ico')
 root.mainloop()
