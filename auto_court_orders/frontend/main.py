@@ -6,6 +6,7 @@ from tkcalendar import Calendar, DateEntry
 from tkinter.messagebox import showwarning, showerror, showinfo, askyesno
 from docxtpl import DocxTemplate
 from ttkthemes import ThemedTk
+from datetime import date
 
 
 root = ThemedTk(theme="breeze")
@@ -33,17 +34,28 @@ LIST_OF_DEBTORS_FOR_THE_COURT = []
 def STATE_DUTY_REGISTRY_WINDOW_FUNCTIONS():
     state_duty_register_generation_window = ThemedTk(theme="breeze")
     state_duty_register_generation_window.title("Реестр на подачу госпошлины")
-    state_duty_register_generation_window.geometry("900x500")
+    state_duty_register_generation_window.geometry("825x440")
     state_duty_register_generation_window.iconbitmap('icon.ico')
+    state_duty_register_generation_window.resizable(False, False)
 
     def save_file():
         filepath = filedialog.askdirectory()
         NAME_OF_THE_SAVE_ACT_LABEL['text'] = filepath
+        state_duty_register_generation_window.attributes('-topmost', True)
+        state_duty_register_generation_window.attributes('-topmost', False)
 
     # TABLE CREATION BLOCK
     TABLE_HEADINGS_register = ("number", "address", "name", "amount_of_state_duty", "management_company")
     TABLE_PARAMETERS_register = Treeview(state_duty_register_generation_window, columns=TABLE_HEADINGS_register, show="headings")
-    TABLE_PARAMETERS_register.grid(columnspan=3)
+    TABLE_PARAMETERS_register.grid(row=0, column=0, sticky="nsew")
+
+    # БЛОКИРУЕМ НАЖАТИЕ ПОВТОРНО
+    asasas = Button(text="РЕЕСТР НА ОПЛАТУ \nГОСПОШЛИНЫ", font=("Arial", 8, 'bold'))
+    asasas.grid(row=14, column=2, rowspan=2)
+
+    ### НАПОЛНЯЕМ ТАБЛИЦУ
+    for i in LIST_OF_THE_REGISTER_OF_THE_STATE_DUTY:
+        TABLE_PARAMETERS_register.insert("", END, values=i)
 
     # TABLE HEADING BLOCK
     TABLE_PARAMETERS_register.heading("number", text="№")
@@ -52,29 +64,108 @@ def STATE_DUTY_REGISTRY_WINDOW_FUNCTIONS():
     TABLE_PARAMETERS_register.heading("amount_of_state_duty", text="Сумма гос.пошлины")
     TABLE_PARAMETERS_register.heading("management_company", text="Управляющая компания")
 
-    TABLE_PARAMETERS_register.column("#1", stretch=NO, width=50)
-    TABLE_PARAMETERS_register.column("#2", stretch=NO, width=200)
-    TABLE_PARAMETERS_register.column("#3", stretch=NO, width=200)
-    TABLE_PARAMETERS_register.column("#4", stretch=NO, width=150)
-    TABLE_PARAMETERS_register.column("#5", stretch=NO, width=150)
+    TABLE_PARAMETERS_register.column("#1", stretch=True, width=50)
+    TABLE_PARAMETERS_register.column("#2", stretch=True, width=200)
+    TABLE_PARAMETERS_register.column("#3", stretch=True, width=200)
+    TABLE_PARAMETERS_register.column("#4", stretch=True, width=150)
+    TABLE_PARAMETERS_register.column("#5", stretch=True, width=180)
 
     # добавляем вертикальную прокрутку
-    scrollbar = Scrollbar(orient=VERTICAL, command=TABLE_PARAMETERS_register.yview)
+    scrollbar = Scrollbar(state_duty_register_generation_window, orient=VERTICAL, command=TABLE_PARAMETERS_register.yview)
     TABLE_PARAMETERS_register.configure(yscroll=scrollbar.set)
-    scrollbar.grid()
+    scrollbar.grid(row=0, column=1, sticky="ns")
+
+    NULL_BLOCK = Label(state_duty_register_generation_window, text='')
+    NULL_BLOCK.grid(column=0, sticky=W)
 
     BUTTON_SAVE_AS_LABEL = Button(state_duty_register_generation_window, text="Путь сохранения", font=("Arial", 10, 'bold'), command=save_file)
-    BUTTON_SAVE_AS_LABEL.grid()
+    BUTTON_SAVE_AS_LABEL.grid(column=0, sticky=W, padx=2)
 
     NAME_OF_THE_SAVE_ACT_LABEL = Label(state_duty_register_generation_window, text='')
-    NAME_OF_THE_SAVE_ACT_LABEL.grid()
+    NAME_OF_THE_SAVE_ACT_LABEL.grid(column=0, sticky=W, padx=2)
+
+    NULL_BLOCK = Label(state_duty_register_generation_window, text='')
+    NULL_BLOCK.grid(column=0, sticky=W, padx=2)
 
     TEXT_NAME_DEBTORS_LABEL = Label(state_duty_register_generation_window, text="Сохранить файл как: ", font=("Arial", 10, 'bold'))
-    TEXT_NAME_DEBTORS_LABEL.grid()
+    TEXT_NAME_DEBTORS_LABEL.grid(column=0, sticky=W, padx=2)
 
-    NAME_DEBTORS_LABEL = Entry(state_duty_register_generation_window)
-    NAME_DEBTORS_LABEL.insert(0, f'{VARIABLE_STREET} {VARIABLE_NUMBER}-{APARTMENT_NUMBER_LABEL.get()}')
-    NAME_DEBTORS_LABEL.grid()
+    NAME_DEBTORS_LABEL = Entry(state_duty_register_generation_window, width=40)
+    NAME_DEBTORS_LABEL.insert(0, 'Реестр на оплату госпошлины')
+    NAME_DEBTORS_LABEL.grid(column=0, sticky=W, padx=2)
+
+    NULL_BLOCK = Label(state_duty_register_generation_window, text='')
+    NULL_BLOCK.grid(column=0, sticky=W, padx=2)
+
+    def distribution_function_by_management_companies():
+        SKY_R = []
+        BSK_P = []
+        KONCEPT = []
+        for i in LIST_OF_THE_REGISTER_OF_THE_STATE_DUTY:
+            if i[4] == 'ООО "СКУ Развитие"':
+                SKY_R.append(i)
+            elif i[4] == 'ООО "БСК Плюс"':
+                BSK_P.append(i)
+            elif i[4] == 'ООО "Концепт"':
+                KONCEPT.append(i)
+            else:
+                showerror(title="Ошибка", message=f"Не смогли найти управляющую компанию по адресу {i[2]}")
+                break
+
+        def TEXT_DOCUMENT(list):
+            # FOR TRANSMISSION TO DOC
+            # list = [[1, ФИО, Адрес, Сумма, УК]]
+            number, name, address, amount_state_duty = '', '', '', ''
+            k = 1
+            M_company = list[0][4].replace('"', '')
+            date_now = date.today()
+
+            for i in list:
+                name += i[1] + '\n'
+                address += i[2] + '\n'
+                amount_state_duty += i[3] + '\n'
+                number += str(k) + '\n'
+                k += 1
+
+            doc = DocxTemplate("for_payment_of_state_duty.docx")  # DOCUMENT TEMPLATE
+
+            context = {'m_company': M_company,  # НАЗВАНИЕ УК
+                       'n_1': number,  # НОМЕР
+                       'n_2': name,  # ФИО
+                       'n_3': address,  # АДРЕС
+                       'n_4': amount_state_duty,  # СУММА
+                       }
+
+            save_folder_path = NAME_OF_THE_SAVE_ACT_LABEL['text']  # COMPUTER SAVE PATH VARIABLE
+            save_name = f'{NAME_DEBTORS_LABEL.get()} {M_company} от {date_now.day}.{date_now.month}.{date_now.year} года'  # VARIABLE ADDRESS AND APARTMENTS OF THE DEBTOR FOR TEXT FORMAT
+            doc.render(context)  # GENERATION OF ALL DATA
+            doc.save(f"{save_folder_path}/{save_name}.docx")  # TRANSFER AND SAVING DATA
+            showinfo(title="Информация", message=f'Реестр на оплату госпошлины для {M_company} создан!')
+
+
+        if len(SKY_R) >= 1:
+            TEXT_DOCUMENT(SKY_R)
+        if len(BSK_P) >= 1:
+            TEXT_DOCUMENT(BSK_P)
+        if len(KONCEPT) >= 1:
+            TEXT_DOCUMENT(KONCEPT)
+
+
+    CREATE_BUTTON_LABEL = Button(state_duty_register_generation_window, text="СОЗДАТЬ", font=("Arial", 10, 'bold'), bg='#79abfc', command=distribution_function_by_management_companies)
+    CREATE_BUTTON_LABEL.grid(column=0, sticky=W, padx=2)
+
+
+###############################################################################################################################################
+    # В СЛУЧАЕ ЗАКРЫТИЯ ОКНА СВОЙСТВА КНОПКИ РЕЕСТР НА ОПЛАТУ ГОСПОШЛИНЫ ВОЗВРАЩАЮТСЯ
+    def finish():
+        asasas = Button(text="РЕЕСТР НА ОПЛАТУ \nГОСПОШЛИНЫ", font=("Arial", 8, 'bold'), command=STATE_DUTY_REGISTRY_WINDOW_FUNCTIONS)
+        asasas.grid(row=14, column=2, rowspan=2)
+        state_duty_register_generation_window.destroy()
+
+    state_duty_register_generation_window.protocol("WM_DELETE_WINDOW", finish)
+    def close_now():
+        state_duty_register_generation_window.destroy()
+
 
 def REGISTRY_WINDOW_FUNCTION_TO_COURT():
     window_for_the_formation_of_the_registry_to_the_court = ThemedTk(theme="breeze")
@@ -435,7 +526,7 @@ def THE_FUNCTION_OF_FORMING_THE_REGISTER_FOR_THE_PAYMENT_OF_THE_STATE_FEE():
             if result_of_the_fee_calculation.get() == '' or result_of_the_fee_calculation.get() == 'Сумма введена некорректно':
                 showerror(title="Ошибка", message="Укажите сумму задолженности!")
             else:
-                p = [f'{VARIABLE_STREET}, {VARIABLE_NUMBER}-{APARTMENT_NUMBER_LABEL.get()}',general_list_of_debtors[0][1], result_of_the_fee_calculation.get(), COMPANY_NAME_LABEL["text"]]
+                p = [len(LIST_OF_THE_REGISTER_OF_THE_STATE_DUTY)+1,f'{VARIABLE_STREET}, {VARIABLE_NUMBER}-{APARTMENT_NUMBER_LABEL.get()}',general_list_of_debtors[0][1], result_of_the_fee_calculation.get(), COMPANY_NAME_LABEL["text"]]
                 LIST_OF_THE_REGISTER_OF_THE_STATE_DUTY.append(p)
                 showinfo(title="Информация", message=f'В реестр добавлен {general_list_of_debtors[0][1]}')
 
@@ -683,7 +774,7 @@ DATA_CHECK_BUTTON = Button(text="СФОРМИРОВАТЬ ПРИКАЗ", font=("
 DATA_CHECK_BUTTON.grid(row=2, column=2)
 
 # BUTTON FOR SENDING DEBTORS TO THE LIST FOR PAYMENT OF STATE DUTIES
-BUTTON_PAYMENT_OF_STATE_DUTIES = Button(text="ДОБАВИТЬ В РЕЕСТР НА \nПОДАЧУ ГОСПОШЛИНЫ", font=("Arial", 8,'bold'), bg='#79abfc', command=THE_FUNCTION_OF_FORMING_THE_REGISTER_FOR_THE_PAYMENT_OF_THE_STATE_FEE)
+BUTTON_PAYMENT_OF_STATE_DUTIES = Button(text="ДОБАВИТЬ В РЕЕСТР НА \nОПЛАТУ ГОСПОШЛИНЫ", font=("Arial", 8,'bold'), bg='#79abfc', command=THE_FUNCTION_OF_FORMING_THE_REGISTER_FOR_THE_PAYMENT_OF_THE_STATE_FEE)
 BUTTON_PAYMENT_OF_STATE_DUTIES.grid(row=3, column=2, rowspan=2)
 
 # BUTTON FOR SENDING DEBTORS TO THE LIST TO SEND TO COURT
@@ -691,7 +782,7 @@ BUTTON_SEND_TO_COURT = Button(text="ДОБАВИТЬ В РЕЕСТР НА \nПО
 BUTTON_SEND_TO_COURT.grid(row=5, column=2, rowspan=2)
 
 #####
-asasas = Button(text="РЕЕСТР НА ПОДАЧУ \nГОСПОШЛИНЫ", font=("Arial", 8,'bold'), command=STATE_DUTY_REGISTRY_WINDOW_FUNCTIONS)
+asasas = Button(text="РЕЕСТР НА ОПЛАТУ \nГОСПОШЛИНЫ", font=("Arial", 8,'bold'), command=STATE_DUTY_REGISTRY_WINDOW_FUNCTIONS)
 asasas.grid(row=14, column=2, rowspan=2)
 
 #####
