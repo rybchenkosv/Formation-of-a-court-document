@@ -33,7 +33,7 @@ LIST_OF_DEBTORS_FOR_THE_COURT = []
 
 def STATE_DUTY_REGISTRY_WINDOW_FUNCTIONS():
     state_duty_register_generation_window = ThemedTk(theme="breeze")
-    state_duty_register_generation_window.title("Реестр на подачу госпошлины")
+    state_duty_register_generation_window.title("Реестр на оплату госпошлины")
     state_duty_register_generation_window.geometry("825x440")
     state_duty_register_generation_window.iconbitmap('icon.ico')
     state_duty_register_generation_window.resizable(False, False)
@@ -97,6 +97,13 @@ def STATE_DUTY_REGISTRY_WINDOW_FUNCTIONS():
     NULL_BLOCK = Label(state_duty_register_generation_window, text='')
     NULL_BLOCK.grid(column=0, sticky=W, padx=2)
 
+    def finish():
+        asasas = Button(text="РЕЕСТР НА ОПЛАТУ \nГОСПОШЛИНЫ", font=("Arial", 8, 'bold'),
+                        command=STATE_DUTY_REGISTRY_WINDOW_FUNCTIONS)
+        asasas.grid(row=14, column=2, rowspan=2)
+        state_duty_register_generation_window.destroy()
+
+
     def distribution_function_by_management_companies():
         SKY_R = []
         BSK_P = []
@@ -150,28 +157,177 @@ def STATE_DUTY_REGISTRY_WINDOW_FUNCTIONS():
         if len(KONCEPT) >= 1:
             TEXT_DOCUMENT(KONCEPT)
 
+        finish()
+
+
+    state_duty_register_generation_window.protocol("WM_DELETE_WINDOW", finish)
+
 
     CREATE_BUTTON_LABEL = Button(state_duty_register_generation_window, text="СОЗДАТЬ", font=("Arial", 10, 'bold'), bg='#79abfc', command=distribution_function_by_management_companies)
     CREATE_BUTTON_LABEL.grid(column=0, sticky=W, padx=2)
 
 
-###############################################################################################################################################
-    # В СЛУЧАЕ ЗАКРЫТИЯ ОКНА СВОЙСТВА КНОПКИ РЕЕСТР НА ОПЛАТУ ГОСПОШЛИНЫ ВОЗВРАЩАЮТСЯ
-    def finish():
-        asasas = Button(text="РЕЕСТР НА ОПЛАТУ \nГОСПОШЛИНЫ", font=("Arial", 8, 'bold'), command=STATE_DUTY_REGISTRY_WINDOW_FUNCTIONS)
-        asasas.grid(row=14, column=2, rowspan=2)
-        state_duty_register_generation_window.destroy()
-
-    state_duty_register_generation_window.protocol("WM_DELETE_WINDOW", finish)
-    def close_now():
-        state_duty_register_generation_window.destroy()
-
 
 def REGISTRY_WINDOW_FUNCTION_TO_COURT():
     window_for_the_formation_of_the_registry_to_the_court = ThemedTk(theme="breeze")
     window_for_the_formation_of_the_registry_to_the_court.title("Реестр на подачу в мировой суд")
-    window_for_the_formation_of_the_registry_to_the_court.geometry("500x300")
+    window_for_the_formation_of_the_registry_to_the_court.geometry("975x440")
     window_for_the_formation_of_the_registry_to_the_court.iconbitmap('icon.ico')
+    window_for_the_formation_of_the_registry_to_the_court.resizable(False, False)
+
+    def save_file():
+        filepath = filedialog.askdirectory()
+        NAME_OF_THE_SAVE_ACT_LABEL['text'] = filepath
+        window_for_the_formation_of_the_registry_to_the_court.attributes('-topmost', True)
+        window_for_the_formation_of_the_registry_to_the_court.attributes('-topmost', False)
+
+    # TABLE CREATION BLOCK
+    TABLE_HEADINGS_register = ("number", "address", "name", "court_number", "management_company")
+    TABLE_PARAMETERS_register = Treeview(window_for_the_formation_of_the_registry_to_the_court, columns=TABLE_HEADINGS_register,
+                                         show="headings")
+    TABLE_PARAMETERS_register.grid(row=0, column=0, sticky="nsew")
+
+    # БЛОКИРУЕМ НАЖАТИЕ ПОВТОРНО
+    asasas1 = Button(text="РЕЕСТР НА ПОДАЧУ \nВ МИРОВОЙ СУД", font=("Arial", 8, 'bold'))
+    asasas1.grid(row=16, column=2, rowspan=2)
+
+    ### НАПОЛНЯЕМ ТАБЛИЦУ
+    for i in LIST_OF_DEBTORS_FOR_THE_COURT:
+        TABLE_PARAMETERS_register.insert("", END, values=i)
+
+    # TABLE HEADING BLOCK
+    TABLE_PARAMETERS_register.heading("number", text="№")
+    TABLE_PARAMETERS_register.heading("address", text="Адрес")
+    TABLE_PARAMETERS_register.heading("name", text="ФИО должника")
+    TABLE_PARAMETERS_register.heading("court_number", text="Номер судебного участка")
+    TABLE_PARAMETERS_register.heading("management_company", text="Управляющая компания")
+
+    TABLE_PARAMETERS_register.column("#1", stretch=True, width=50)
+    TABLE_PARAMETERS_register.column("#2", stretch=True, width=200)
+    TABLE_PARAMETERS_register.column("#3", stretch=True, width=200)
+    TABLE_PARAMETERS_register.column("#4", stretch=True, width=250)
+    TABLE_PARAMETERS_register.column("#5", stretch=True, width=230)
+
+    # добавляем вертикальную прокрутку
+    scrollbar = Scrollbar(window_for_the_formation_of_the_registry_to_the_court, orient=VERTICAL,
+                          command=TABLE_PARAMETERS_register.yview)
+    TABLE_PARAMETERS_register.configure(yscroll=scrollbar.set)
+    scrollbar.grid(row=0, column=1, sticky="ns")
+
+    NULL_BLOCK = Label(window_for_the_formation_of_the_registry_to_the_court, text='')
+    NULL_BLOCK.grid(column=0, sticky=W)
+
+    BUTTON_SAVE_AS_LABEL = Button(window_for_the_formation_of_the_registry_to_the_court, text="Путь сохранения",
+                                  font=("Arial", 10, 'bold'), command=save_file)
+    BUTTON_SAVE_AS_LABEL.grid(column=0, sticky=W, padx=2)
+
+    NAME_OF_THE_SAVE_ACT_LABEL = Label(window_for_the_formation_of_the_registry_to_the_court, text='')
+    NAME_OF_THE_SAVE_ACT_LABEL.grid(column=0, sticky=W, padx=2)
+
+    NULL_BLOCK = Label(window_for_the_formation_of_the_registry_to_the_court, text='')
+    NULL_BLOCK.grid(column=0, sticky=W, padx=2)
+
+    TEXT_NAME_DEBTORS_LABEL = Label(window_for_the_formation_of_the_registry_to_the_court, text="Сохранить файл как: ",
+                                    font=("Arial", 10, 'bold'))
+    TEXT_NAME_DEBTORS_LABEL.grid(column=0, sticky=W, padx=2)
+
+    NAME_DEBTORS_LABEL = Entry(window_for_the_formation_of_the_registry_to_the_court, width=40)
+    NAME_DEBTORS_LABEL.insert(0, 'Реестр на оплату госпошлины')
+    NAME_DEBTORS_LABEL.grid(column=0, sticky=W, padx=2)
+
+    NULL_BLOCK = Label(window_for_the_formation_of_the_registry_to_the_court, text='')
+    NULL_BLOCK.grid(column=0, sticky=W, padx=2)
+
+    def finish():
+        asasas1 = Button(text="РЕЕСТР НА ПОДАЧУ \nВ МИРОВОЙ СУД", font=("Arial", 8, 'bold'),
+                         command=REGISTRY_WINDOW_FUNCTION_TO_COURT)
+        asasas1.grid(row=16, column=2, rowspan=2)
+        window_for_the_formation_of_the_registry_to_the_court.destroy()
+
+    def distribution_function_by_management_companies():
+        court_number_8 = []
+        court_number_9 = []
+
+        for i in LIST_OF_DEBTORS_FOR_THE_COURT:
+            street = ''
+            number = ''
+            street = i[1][:i[1].find(',')]
+            number = i[1][i[1].find(' ') + 1:i[1].find('-')]
+            if Database.COURT_NUMBER(street, number) == 'Мировому судье судебного участка №9 \nв Березовском районе Красноярского края \nПашковскому А.Д.':
+                court_number_9.append(i)
+            elif Database.COURT_NUMBER(street, number) == 'Мировому судье судебного участка №8 \nв Березовском районе Красноярского края \nБелявцевой Е.А.':
+                court_number_8.append(i)
+                else:
+                    showerror(title="Ошибка", message=f"Не смогли найти судебный участок по адресу {i[1]}")
+                    break
+
+        if len(court_number_8) >= 1:
+            for i in court_number_8:
+                SKY_R = []
+                BSK_P = []
+                KONCEPT = []
+                for i in LIST_OF_DEBTORS_FOR_THE_COURT:
+                    if i[4] == 'ООО "СКУ Развитие"':
+                        SKY_R.append(i)
+                    elif i[4] == 'ООО "БСК Плюс"':
+                        BSK_P.append(i)
+                    elif i[4] == 'ООО "Концепт"':
+                        KONCEPT.append(i)
+                    else:
+                        showerror(title="Ошибка", message=f"Не смогли найти управляющую компанию по адресу {i[2]}")
+                        break
+                if len(SKY_R) >= 1:
+                    TEXT_DOCUMENT(SKY_R, ) ############################## НАДО ЛИ ВСЕ ЭТО ПРОГОНЯТЬ ЕСЛИ В СПИСКЕ ИЗНАЧАЛЬ ПРОПИСАН НОМЕР УЧАСТОК? ВОЗМОЖНО ПРОСТО РАСКИДАТЬ ИХ ПО УПРАВЛЯЙКАМ И ПРОГНАТЬ ЧЕРЕЗ ТЕКСТ
+                if len(BSK_P) >= 1:
+                    TEXT_DOCUMENT(BSK_P)
+                if len(KONCEPT) >= 1:
+                    TEXT_DOCUMENT(KONCEPT)
+
+        def TEXT_DOCUMENT(list):
+            # FOR TRANSMISSION TO DOC
+            # list = [[1, ФИО, Адрес, Сумма, УК]]
+            number, name, address, amount_state_duty = '', '', '', ''
+            k = 1
+            M_company = list[0][4].replace('"', '')
+            date_now = date.today()
+
+            for i in list:
+                name += i[1] + '\n'
+                address += i[2] + '\n'
+                amount_state_duty += i[3] + '\n'
+                number += str(k) + '\n'
+                k += 1
+
+            doc = DocxTemplate("court_register.docx")  # DOCUMENT TEMPLATE
+
+            context = {'m_company': M_company,  # НАЗВАНИЕ УК
+                       'n_1': number,  # НОМЕР
+                       'n_2': name,  # ФИО
+                       'n_3': address,  # АДРЕС должника
+                       'address': xx,  # Адрес УК
+                       'court_number ' : xx, #Номер и адрес суда
+                       }
+
+            save_folder_path = NAME_OF_THE_SAVE_ACT_LABEL['text']  # COMPUTER SAVE PATH VARIABLE
+            save_name = f'{NAME_DEBTORS_LABEL.get()} {M_company} от {date_now.day}.{date_now.month}.{date_now.year} года'  # VARIABLE ADDRESS AND APARTMENTS OF THE DEBTOR FOR TEXT FORMAT
+            doc.render(context)  # GENERATION OF ALL DATA
+            doc.save(f"{save_folder_path}/{save_name}.docx")  # TRANSFER AND SAVING DATA
+            showinfo(title="Информация", message=f'Реестр на подачу в мировой суд для {M_company} создан!')
+
+        if len(SKY_R) >= 1:
+            TEXT_DOCUMENT(SKY_R)
+        if len(BSK_P) >= 1:
+            TEXT_DOCUMENT(BSK_P)
+        if len(KONCEPT) >= 1:
+            TEXT_DOCUMENT(KONCEPT)
+
+        finish()
+
+    window_for_the_formation_of_the_registry_to_the_court.protocol("WM_DELETE_WINDOW", finish)
+
+    CREATE_BUTTON_LABEL = Button(window_for_the_formation_of_the_registry_to_the_court, text="СОЗДАТЬ", font=("Arial", 10, 'bold'),
+                                 bg='#79abfc', command=distribution_function_by_management_companies)
+    CREATE_BUTTON_LABEL.grid(column=0, sticky=W, padx=2)
 
 
 # COLLECTION FUNCTION LIST OF EXCLUDED DEBTORS NUMBERS
@@ -540,18 +696,14 @@ def THE_FUNCTION_OF_FORMING_A_LIST_OF_DEBTORS_FOR_THE_COURT():
             if result_of_the_fee_calculation.get() == '' or result_of_the_fee_calculation.get() == 'Сумма введена некорректно':
                 showerror(title="Ошибка", message="Укажите сумму задолженности!")
             else:
-                confirmation_of_the_number_of_debtors = askyesno(title="Подтвержение операции", message="Вы добавили всех должников?")
-                if confirmation_of_the_number_of_debtors:
-                    showinfo("Результат", "Операция подтверждена")
-                    s = ''
-                    for i in range(len(general_list_of_debtors)):
-                        s+= general_list_of_debtors[i][1]
-                        if i+1 != len(general_list_of_debtors):
-                            s+= ', '
-                    p = [f'{VARIABLE_STREET}, {VARIABLE_NUMBER}-{APARTMENT_NUMBER_LABEL.get()}', s, JUDICIAL_SECTION_LABEL["text"], COMPANY_NAME_LABEL["text"]]
-                    LIST_OF_DEBTORS_FOR_THE_COURT.append(p)
-                    print(LIST_OF_DEBTORS_FOR_THE_COURT)
-                    showinfo("Информация", f"В реестр добавлены: {s}")
+                s = ''
+                for i in range(len(general_list_of_debtors)):
+                    s+= general_list_of_debtors[i][1]
+                    if i+1 != len(general_list_of_debtors):
+                        s+= ', '
+                p = [len(LIST_OF_THE_REGISTER_OF_THE_STATE_DUTY)+1, f'{VARIABLE_STREET}, {VARIABLE_NUMBER}-{APARTMENT_NUMBER_LABEL.get()}', s, JUDICIAL_SECTION_LABEL["text"][:35], COMPANY_NAME_LABEL["text"]]
+                LIST_OF_DEBTORS_FOR_THE_COURT.append(p)
+                showinfo("Информация", f"В реестр добавлены: {s}")
 
 
 ## BLOCKS ON THE LEFT
