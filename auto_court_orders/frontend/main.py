@@ -232,7 +232,7 @@ def REGISTRY_WINDOW_FUNCTION_TO_COURT():
     TEXT_NAME_DEBTORS_LABEL.grid(column=0, sticky=W, padx=2)
 
     NAME_DEBTORS_LABEL = Entry(window_for_the_formation_of_the_registry_to_the_court, width=40)
-    NAME_DEBTORS_LABEL.insert(0, 'Реестр на оплату госпошлины')
+    NAME_DEBTORS_LABEL.insert(0, 'Реестр на подачу в мировой суд')
     NAME_DEBTORS_LABEL.grid(column=0, sticky=W, padx=2)
 
     NULL_BLOCK = Label(window_for_the_formation_of_the_registry_to_the_court, text='')
@@ -257,12 +257,45 @@ def REGISTRY_WINDOW_FUNCTION_TO_COURT():
                 court_number_9.append(i)
             elif Database.COURT_NUMBER(street, number) == 'Мировому судье судебного участка №8 \nв Березовском районе Красноярского края \nБелявцевой Е.А.':
                 court_number_8.append(i)
-                else:
-                    showerror(title="Ошибка", message=f"Не смогли найти судебный участок по адресу {i[1]}")
-                    break
+            else:
+                showerror(title="Ошибка", message=f"Не смогли найти судебный участок по адресу {i[1]}")
+                break
+
+        def TEXT_DOCUMENT(list, court_number_s):
+            # FOR TRANSMISSION TO DOC
+            # list = [[1, ФИО, Адрес, Сумма, УК]]
+            number, name, address = [i+1 for i in range(len(list))], [i[1] for i in list], [i[2] for i in list]
+
+            if list[0][4] == 'ООО "СКУ Развитие"':
+                Address_UK = '662520 Красноярский край, Березовский район, п. Березовка ул. Юности, пом. 2 каб. 2'
+            elif list[0][4] == 'ООО "БСК Плюс"' or list[0][4] == 'ООО "Концепт"':
+                Address_UK = '662520 Красноярский край, Березовский район, п. Березовка ул. Юности, д. 19/2'
+            else:
+                showerror(title="Ошибка", message=f"Не смогли найти управляющую компанию при формировании реестра!")
+            text_M_company = list[0][4]
+            M_company = list[0][4].replace('"', '')
+            date_now = date.today()
+
+            doc = DocxTemplate("court_register.docx")  # DOCUMENT TEMPLATE
+
+            tbl_contents = [{'n_1': n_number, 'n_2': n_name, 'n_3': n_address}
+                            for n_number, n_name, n_address in zip(number, name, address)]
+
+            context = {'tbl_contents': tbl_contents, #ЗАПОЛНЕНИЕ ТАБЛИЦЫ ПОСТРОЧНО
+                       'm_company': text_M_company,  # НАЗВАНИЕ УК
+                       'address_uk' : Address_UK,  # Адрес УК
+                       'court_number' : court_number_s, #Номер и адрес суда
+                       }
+
+            save_folder_path = NAME_OF_THE_SAVE_ACT_LABEL['text']  # COMPUTER SAVE PATH VARIABLE
+            save_name = f'Реестр на подачу в мировой суд {M_company} {court_number_s[15:21]}ый {court_number_s[25:30]}ок {court_number_s[33:35]} от {date_now.day}.{date_now.month}.{date_now.year} года'  # VARIABLE ADDRESS AND APARTMENTS OF THE DEBTOR FOR TEXT FORMAT
+            doc.render(context)  # GENERATION OF ALL DATA
+            doc.save(f"{save_folder_path}/{save_name}.docx")  # TRANSFER AND SAVING DATA
+            showinfo(title="Информация", message=f'Реестр на подачу в мировой суд для {M_company} создан!')
 
         if len(court_number_8) >= 1:
             for i in court_number_8:
+                court_number_s = 'Мировому судье судебного участка №8 в Березовском районе Красноярского края Белявцевой Е.А.'
                 SKY_R = []
                 BSK_P = []
                 KONCEPT = []
@@ -277,49 +310,38 @@ def REGISTRY_WINDOW_FUNCTION_TO_COURT():
                         showerror(title="Ошибка", message=f"Не смогли найти управляющую компанию по адресу {i[2]}")
                         break
                 if len(SKY_R) >= 1:
-                    TEXT_DOCUMENT(SKY_R, ) ############################## НАДО ЛИ ВСЕ ЭТО ПРОГОНЯТЬ ЕСЛИ В СПИСКЕ ИЗНАЧАЛЬ ПРОПИСАН НОМЕР УЧАСТОК? ВОЗМОЖНО ПРОСТО РАСКИДАТЬ ИХ ПО УПРАВЛЯЙКАМ И ПРОГНАТЬ ЧЕРЕЗ ТЕКСТ
+                    n_s = '8'
+                    TEXT_DOCUMENT(SKY_R, court_number_s)
                 if len(BSK_P) >= 1:
-                    TEXT_DOCUMENT(BSK_P)
+                    n_s = '8'
+                    TEXT_DOCUMENT(BSK_P, court_number_s)
                 if len(KONCEPT) >= 1:
-                    TEXT_DOCUMENT(KONCEPT)
+                    n_s = '8'
+                    TEXT_DOCUMENT(KONCEPT, court_number_s)
 
-        def TEXT_DOCUMENT(list):
-            # FOR TRANSMISSION TO DOC
-            # list = [[1, ФИО, Адрес, Сумма, УК]]
-            number, name, address, amount_state_duty = '', '', '', ''
-            k = 1
-            M_company = list[0][4].replace('"', '')
-            date_now = date.today()
+        if len(court_number_9) >= 1:
+            for i in court_number_9:
+                court_number_s = 'Мировому судье судебного участка №9 в Березовском районе Красноярского края Пашковскому А.Д.'
+                SKY_R = []
+                BSK_P = []
+                KONCEPT = []
+                for i in LIST_OF_DEBTORS_FOR_THE_COURT:
+                    if i[4] == 'ООО "СКУ Развитие"':
+                        SKY_R.append(i)
+                    elif i[4] == 'ООО "БСК Плюс"':
+                        BSK_P.append(i)
+                    elif i[4] == 'ООО "Концепт"':
+                        KONCEPT.append(i)
+                    else:
+                        showerror(title="Ошибка", message=f"Не смогли найти управляющую компанию по адресу {i[2]}")
+                        break
+                if len(SKY_R) >= 1:
+                    TEXT_DOCUMENT(SKY_R, court_number_s)
+                if len(BSK_P) >= 1:
+                    TEXT_DOCUMENT(BSK_P, court_number_s)
+                if len(KONCEPT) >= 1:
+                    TEXT_DOCUMENT(KONCEPT, court_number_s)
 
-            for i in list:
-                name += i[1] + '\n'
-                address += i[2] + '\n'
-                amount_state_duty += i[3] + '\n'
-                number += str(k) + '\n'
-                k += 1
-
-            doc = DocxTemplate("court_register.docx")  # DOCUMENT TEMPLATE
-
-            context = {'m_company': M_company,  # НАЗВАНИЕ УК
-                       'n_1': number,  # НОМЕР
-                       'n_2': name,  # ФИО
-                       'n_3': address,  # АДРЕС должника
-                       'address': xx,  # Адрес УК
-                       'court_number ' : xx, #Номер и адрес суда
-                       }
-
-            save_folder_path = NAME_OF_THE_SAVE_ACT_LABEL['text']  # COMPUTER SAVE PATH VARIABLE
-            save_name = f'{NAME_DEBTORS_LABEL.get()} {M_company} от {date_now.day}.{date_now.month}.{date_now.year} года'  # VARIABLE ADDRESS AND APARTMENTS OF THE DEBTOR FOR TEXT FORMAT
-            doc.render(context)  # GENERATION OF ALL DATA
-            doc.save(f"{save_folder_path}/{save_name}.docx")  # TRANSFER AND SAVING DATA
-            showinfo(title="Информация", message=f'Реестр на подачу в мировой суд для {M_company} создан!')
-
-        if len(SKY_R) >= 1:
-            TEXT_DOCUMENT(SKY_R)
-        if len(BSK_P) >= 1:
-            TEXT_DOCUMENT(BSK_P)
-        if len(KONCEPT) >= 1:
-            TEXT_DOCUMENT(KONCEPT)
 
         finish()
 
@@ -343,6 +365,14 @@ def CLEAR_ALL_DATA_FROM_TABLE():
     for i in s:
         all_del.append(i[3:])
         TABLE_PARAMETERS.delete(i)
+    general_list_of_debtors.clear()
+    general_list_of_debtors_second_window.clear()
+    DEBTORS_FULL_NAME_LABEL.delete(0, END)
+    DEBTORS_DATE_OF_BIRTH_LABEL.delete(0, END)
+    PASSPORT_DATA_OF_THE_DEBTOR_LABEL.delete(0, END)
+    DEBTOR_DEBT_LABEL.delete(0, END)
+    APARTMENT_NUMBER_LABEL.delete(0, END)
+    showinfo(title="Информация", message='Все данные очищены!')
 
 
 # THIS FUNCTION IS RESPONSIBLE FOR ASSIGNING VALUES TO THE RIGHT SIDE OF THE APPLICATION
@@ -701,7 +731,7 @@ def THE_FUNCTION_OF_FORMING_A_LIST_OF_DEBTORS_FOR_THE_COURT():
                     s+= general_list_of_debtors[i][1]
                     if i+1 != len(general_list_of_debtors):
                         s+= ', '
-                p = [len(LIST_OF_THE_REGISTER_OF_THE_STATE_DUTY)+1, f'{VARIABLE_STREET}, {VARIABLE_NUMBER}-{APARTMENT_NUMBER_LABEL.get()}', s, JUDICIAL_SECTION_LABEL["text"][:35], COMPANY_NAME_LABEL["text"]]
+                p = [len(LIST_OF_DEBTORS_FOR_THE_COURT)+1, f'{VARIABLE_STREET}, {VARIABLE_NUMBER}-{APARTMENT_NUMBER_LABEL.get()}', s, JUDICIAL_SECTION_LABEL["text"][:35], COMPANY_NAME_LABEL["text"]]
                 LIST_OF_DEBTORS_FOR_THE_COURT.append(p)
                 showinfo("Информация", f"В реестр добавлены: {s}")
 
