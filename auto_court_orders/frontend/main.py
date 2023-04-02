@@ -672,6 +672,13 @@ def VALIDATION_AND_DATA_GENERATION_FUNCTION():
         NAME_DEBTORS_LABEL.insert(0, f'{VARIABLE_STREET} {VARIABLE_NUMBER}-{APARTMENT_NUMBER_LABEL.get()} {FIRST_LIST_OF_DEBTORS_EXCEPT_EXCLUDED[0][1]} от {date_now.day}.{date_now.month}.{date_now.year} года')
         NAME_DEBTORS_LABEL.grid(row=11 + counter_t, column=0, sticky=W, padx=10)
 
+        print(FIRST_LIST_OF_DEBTORS_EXCEPT_EXCLUDED)
+        print(general_list_of_debtors_second_window)
+        print(general_list_of_debtors)
+        print(LIST_OF_EXCLUDED_DEBTORS_NUMBERS)
+
+        print(SECOND_LIST_OF_DEBTORS_EXCEPT_EXCLUDED)
+
     #FUNCTION OF DATA CONVERSION TO DOC FORMAT AND SAVING OF THE FINISHED DOCUMENT
         def TEXT_DOCUMENT():
             # THE FUNCTION OF FORMING FROM THE RECEIVED DATA A STRING WITH \n HYPHENATIONS
