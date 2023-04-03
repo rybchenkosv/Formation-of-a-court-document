@@ -7,6 +7,7 @@ from tkinter.messagebox import showwarning, showerror, showinfo, askyesno
 from docxtpl import DocxTemplate
 from ttkthemes import ThemedTk
 from datetime import date
+import datetime
 
 
 root = ThemedTk(theme="breeze")
@@ -32,6 +33,164 @@ LIST_OF_DEBTORS_FOR_THE_COURT = []
 ####
 FIRST_LIST_OF_DEBTORS_EXCEPT_EXCLUDED = []
 SECOND_LIST_OF_DEBTORS_EXCEPT_EXCLUDED = []
+
+####
+list_with_legal_representative = []
+list_of_adults = []
+list_of_owner_in_the_absence = []
+
+#
+def WINDOW_FOR_SELECTING_THE_OWNER_IF_THERE_ARE_NO_ONE():
+    window_no_owner = ThemedTk(theme="breeze")
+    window_no_owner.title("Укажите собственника")
+    window_no_owner.geometry("400x200")
+    window_no_owner.resizable(False, False)
+
+    def end_of_selection():
+        if lang.get() == '':
+            showerror(title="Ошибка", message="Вы никого не выбрали!")
+            window_no_owner.attributes('-topmost', True)
+            window_no_owner.attributes('-topmost', False)
+        else:
+            showinfo("Информация", f"Вы выбрали собственником - {lang.get()}")
+            list_of_owner_in_the_absence.append(lang.get())
+            print(list_of_owner_in_the_absence)
+            window_no_owner.destroy()
+
+    lang = StringVar(window_no_owner)
+    LABEL = Label(window_no_owner, text="Необходимо выбрать собственника", font=("Arial", 10, 'bold'))
+    LABEL.grid()
+
+    btn1 = Radiobutton(window_no_owner,
+                       text='Муниципальное образование поселок Березовка \nБерезовского района Красноярского края',
+                       value='Муниципальное образование поселок Березовка Березовского района Красноярского края', variable=lang)
+    btn1.grid()
+
+    btn2 = Radiobutton(window_no_owner,
+                       text='Муниципальное образование - Березовский район \nКрасноярского края',
+                       value='Муниципальное образование - Березовский район Красноярского края', variable=lang)
+    btn2.grid()
+
+    btn = Button(window_no_owner, text="Выбрать", command=end_of_selection)
+    btn.grid()
+#
+def OWNER_SELECTION_FUNCTION(d):
+    verification_of_owners = 0
+    for i in d:
+        if i[4] == '+':
+            verification_of_owners+=1
+            break
+    if verification_of_owners == 0:
+        showwarning(title="Внимание", message='При составлении судебного приказа вы не указали ни одного собственника!')
+        WINDOW_FOR_SELECTING_THE_OWNER_IF_THERE_ARE_NO_ONE()
+
+#
+def WINDOW_FUNCTION_FOR_SELECTION_OF_LEGAL_REPRESENTATIVE(not_18_old,list_of_adults,d):
+    def end_of_selection():
+        if lang.get() == 'Свой вариант' and entry.get() != '':
+            for i in d:
+                if not_18_old == i[1]:
+                    list_with_legal_representative.append([i[0], i[1], i[2], i[3] + f' в лице законного представителя {entry.get()}', i[4], i[5]])
+            showinfo("Информация",
+                     f"Для несовершеннолетнего собственника {not_18_old} Вы выбрали законного представителя {entry.get()}")
+            window_not_18_old.destroy()
+
+        elif lang.get() == 'Свой вариант' and entry.get() == '':
+            showerror(title="Ошибка", message="Вы не ввели ФИО законного представителя!")
+            window_not_18_old.attributes('-topmost', True)
+            window_not_18_old.attributes('-topmost', False)
+        elif lang.get() == '':
+            showerror(title="Ошибка", message="Вы никого не выбрали!")
+            window_not_18_old.attributes('-topmost', True)
+            window_not_18_old.attributes('-topmost', False)
+        else:
+            if len(list_with_legal_representative) == 0:
+                for i in d:
+                    if not_18_old == i[1]:
+                        list_with_legal_representative.append([i[0],i[1],i[2],i[3]+f' в лице законного представителя {lang.get()}',i[4],i[5]])
+                        k = i[1]
+            else:
+                for i in range(len(list_with_legal_representative)):
+                    if list_with_legal_representative[i][1] == not_18_old:
+                        list_with_legal_representative[i] = [list_with_legal_representative[i][0], list_with_legal_representative[i][1], list_with_legal_representative[i][2],
+                                                             list_with_legal_representative[i][3] + f' в лице законного представителя {lang.get()}',
+                                                             list_with_legal_representative[i][4], list_with_legal_representative[i][5]]
+            showinfo("Информация",
+                     f"Для несовершеннолетнего собственника {not_18_old} Вы выбрали законного представителя {lang.get()}")
+            window_not_18_old.destroy()
+
+
+    window_not_18_old = ThemedTk(theme="breeze")
+    window_not_18_old.title("Укажите законного представителя")
+    window_not_18_old.geometry("500x440")
+    window_not_18_old.resizable(False, False)
+
+    lang = StringVar(window_not_18_old)  # по умолчанию будет выбран элемент с value=java
+
+    LABEL = Label(window_not_18_old, text=f"Укажите законного представителя для {not_18_old}",
+                  font=("Arial", 10, 'bold'))
+    LABEL.grid()
+
+    for i in range(len(list_of_adults)):
+        python_btn = Radiobutton(window_not_18_old,text=list_of_adults[i], value=list_of_adults[i], variable=lang)
+        python_btn.grid()
+
+    python_btn1 = Radiobutton(window_not_18_old, text='Свой вариант', value='Свой вариант', variable=lang)
+    python_btn1.grid()
+
+    entry = Entry(window_not_18_old)
+    entry.grid()
+
+    btn = Button(window_not_18_old,text="Выбрать", command=end_of_selection)
+    btn.grid()
+
+#
+def AGE_CHECK_FUNCTION(d):
+    not_18_old = '0'
+    # СОСТАВЛЯЕМ СПИСОК СОВЕРШЕННОЛЕТНИХ
+    for i in d:
+        if i[2][0] != '0':
+            birthday = datetime.date(int(i[2][6:]), int(i[2][3:5]), int(i[2][:2]))
+            today = datetime.date.today()
+            years = (today.year - birthday.year)
+            if birthday.month >= today.month and birthday.day > today.day:
+                years -= 1
+            if years >= 18:
+                list_of_adults.append(i[1])
+        else:
+            birthday = datetime.date(int(i[2][6:]), int(i[2][3:5]), int(i[2][1]))
+            today = datetime.date.today()
+            years = (today.year - birthday.year)
+            if birthday.month >= today.month and birthday.day > today.day:
+                years -= 1
+            if years >= 18:
+                list_of_adults.append(i[1])
+    print(f'Сформированный список взрослых {list_of_adults}')
+    # ВЫЯВЛЯЕМ НЕСОВЕРШЕННОЛЕТНИХ
+    for i in d:
+        if i[4] == '+':
+            if i[2][0] != '0':
+                birthday = datetime.date(int(i[2][6:]), int(i[2][3:5]), int(i[2][:2]))
+                today = datetime.date.today()
+                years = (today.year - birthday.year)
+                if birthday.month >= today.month and birthday.day > today.day:
+                    years -= 1
+                if years < 18:
+                    showwarning(title="Внимание", message=f"Собственник {i[1]} является несовершеннолетним. Необходимо указать законного представителя!")
+                    not_18_old = i[1]
+                    WINDOW_FUNCTION_FOR_SELECTION_OF_LEGAL_REPRESENTATIVE(not_18_old, list_of_adults, d)
+            else:
+                birthday = datetime.date(int(i[2][6:]), int(i[2][3:5]), int(i[2][1]))
+                today = datetime.date.today()
+                years = (today.year - birthday.year)
+                if birthday.month >= today.month and birthday.day > today.day:
+                    years -= 1
+                if years < 18:
+                    showwarning(title="Внимание", message=f"Собственник {i[1]} является несовершеннолетним. Необходимо указать законного представителя!")
+                    not_18_old = i[1]
+                    WINDOW_FUNCTION_FOR_SELECTION_OF_LEGAL_REPRESENTATIVE(not_18_old, list_of_adults, d)
+
+
 
 # Функция проверки введены ли все данные
 
@@ -403,7 +562,16 @@ def delete():
     selection = TABLE_PARAMETERS.selection()[0]
     z = [TABLE_PARAMETERS.set(selection)[i] for i in TABLE_PARAMETERS.set(selection)]
     TABLE_PARAMETERS.delete(selection)
+    list_of_owner_in_the_absence.clear()
+    print(z)
+    for i in range(len(list_with_legal_representative)):
+        if list_with_legal_representative[i][1] == z[0] and list_with_legal_representative[i][2] == z[1]:
+             del list_with_legal_representative[i]
+    for i in range(len(list_of_adults)):
+        if list_of_adults[i] == z[0]:
+            del list_of_adults[i]
     LIST_OF_EXCLUDED_DEBTORS_NUMBERS.append(z)
+    print(list_of_adults)
 
 # LISTING FUNCTION OF ALL REMOTE
 def CLEAR_ALL_DATA_FROM_TABLE():
@@ -413,6 +581,9 @@ def CLEAR_ALL_DATA_FROM_TABLE():
         TABLE_PARAMETERS.delete(i)
     general_list_of_debtors.clear()
     general_list_of_debtors_second_window.clear()
+    list_with_legal_representative.clear()
+    list_of_adults.clear()
+    list_of_owner_in_the_absence.clear()
     DEBTORS_FULL_NAME_LABEL.delete(0, END)
     DEBTORS_DATE_OF_BIRTH_LABEL.delete(0, END)
     PASSPORT_DATA_OF_THE_DEBTOR_LABEL.delete(0, END)
@@ -474,6 +645,7 @@ def FUNCTION_TO_DISPLAY_THE_TOTAL_AMOUNT_OF_DEBT(*args):
 
 # FUNCTION OF COLLECTING DEBTORS TO THE BASE AND DISPLAYING TO THE APPLICATION TABLE
 def ENTER_DATA_IN_THE_TABLE(*args):
+    global list_for_a_new_debtor
     list_for_a_new_debtor = []
     if PROPERTY_CONFIRMATION_STR.get() == '' or REGISTRATION_CHECK_STR.get() == '':  # OUTPUT OF THE ERROR WINDOW OF NOT SPECIFIED DATA ABOUT REGISTERED OR OWNERS
         return showwarning(title="Ошибка",
@@ -564,6 +736,7 @@ def ENTER_DATA_IN_THE_TABLE(*args):
                          'п.д. отсутствуют'])
                 for person in list_for_a_new_debtor:
                     TABLE_PARAMETERS.insert("", END, values=person[1:])
+                AGE_CHECK_FUNCTION(list_for_a_new_debtor)
             else:
                 return showwarning(title="Ошибка", message="Вы неверно заполнили поле 'Дата рождения должника'")
 
@@ -571,219 +744,247 @@ def ENTER_DATA_IN_THE_TABLE(*args):
 
 # FUNCTION OF CREATING A DATA CHECK WINDOW AND FORMING A JUDICIAL ACT
 def VALIDATION_AND_DATA_GENERATION_FUNCTION():
-    # WE FORM LISTS OF DEBTORS WITHOUT DELETES FOR DISPLAY IN THE CONFIRMATION WINDOW AND SEND TO DOC
-    FIRST_LIST_OF_DEBTORS_EXCEPT_EXCLUDED.clear()
-    SECOND_LIST_OF_DEBTORS_EXCEPT_EXCLUDED.clear()
-    def FUNCTION_SORTING_LISTS_DEBTORS(a, b, c):
-        global SECOND_LIST_OF_DEBTORS_EXCEPT_EXCLUDED, FIRST_LIST_OF_DEBTORS_EXCEPT_EXCLUDED
-        SECOND_LIST_OF_DEBTORS_EXCEPT_EXCLUDED, FIRST_LIST_OF_DEBTORS_EXCEPT_EXCLUDED = [], []
-        zz = []
-        for i in b:
-            z = []
-            for j in i:
-                z.append(j)
-            zz.append(z)
-        zzz = []
-        for i in zz:
-            zzz.append(i[1:])
-        for i in range(len(zzz)):
-            if zzz[i] not in c and zzz[i] not in SECOND_LIST_OF_DEBTORS_EXCEPT_EXCLUDED:
-                SECOND_LIST_OF_DEBTORS_EXCEPT_EXCLUDED.append(zz[i])
+    if len(general_list_of_debtors) == 0:
+        showerror(title="Ошибка", message="Вы не добавили ни одного должника!")
+    else:
+        if APARTMENT_NUMBER_LABEL.get() == '' or VARIABLE_STREET == '' or VARIABLE_NUMBER == '':
+            showerror(title="Ошибка", message="Вы не указали адрес должника!")
+        else:
+            if result_of_the_fee_calculation.get() == '' or result_of_the_fee_calculation.get() == 'Сумма введена некорректно':
+                showerror(title="Ошибка", message="Укажите сумму задолженности!")
+            else:
+                # WE FORM LISTS OF DEBTORS WITHOUT DELETES FOR DISPLAY IN THE CONFIRMATION WINDOW AND SEND TO DOC
+                FIRST_LIST_OF_DEBTORS_EXCEPT_EXCLUDED.clear()
+                SECOND_LIST_OF_DEBTORS_EXCEPT_EXCLUDED.clear()
+                print(list_with_legal_representative)
+                OWNER_SELECTION_FUNCTION(list_for_a_new_debtor)
+                def FUNCTION_SORTING_LISTS_DEBTORS(a, b, c):
+                    global SECOND_LIST_OF_DEBTORS_EXCEPT_EXCLUDED, FIRST_LIST_OF_DEBTORS_EXCEPT_EXCLUDED
+                    SECOND_LIST_OF_DEBTORS_EXCEPT_EXCLUDED, FIRST_LIST_OF_DEBTORS_EXCEPT_EXCLUDED = [], []
+                    zz = []
+                    for i in b:
+                        z = []
+                        for j in i:
+                            z.append(j)
+                        zz.append(z)
+                    zzz = []
+                    for i in zz:
+                        zzz.append(i[1:])
+                    for i in range(len(zzz)):
+                        if zzz[i] not in c and zzz[i] not in SECOND_LIST_OF_DEBTORS_EXCEPT_EXCLUDED:
+                            SECOND_LIST_OF_DEBTORS_EXCEPT_EXCLUDED.append(zz[i])
 
-        for i in SECOND_LIST_OF_DEBTORS_EXCEPT_EXCLUDED:
-            if i not in a:
-                FIRST_LIST_OF_DEBTORS_EXCEPT_EXCLUDED.append(i[:4])
+                    for i in SECOND_LIST_OF_DEBTORS_EXCEPT_EXCLUDED:
+                        if i not in a:
+                            FIRST_LIST_OF_DEBTORS_EXCEPT_EXCLUDED.append(i[:4])
 
-    if CONTROL_FUNCTION() == True:
-        window = ThemedTk(theme="breeze")
-        window.title("Проверьте введенные данные")
-        window.geometry("900x450")
-        window.iconbitmap('icon.ico')
-        window.resizable(False, False)
-        date_now = date.today()
+                if CONTROL_FUNCTION() == True:
+                    window = ThemedTk(theme="breeze")
+                    window.title("Проверьте введенные данные")
+                    window.geometry("900x450")
+                    window.iconbitmap('icon.ico')
+                    window.resizable(False, False)
+                    date_now = date.today()
 
-        # БЛОКИРУЕМ ПОВТОРНОЕ ОТКРЫТИЕ ОКНА
-        DATA_CHECK_BUTTON = Button(text="СФОРМИРОВАТЬ ПРИКАЗ", font=("Arial", 8, 'bold'),bg='#79abfc')
-        DATA_CHECK_BUTTON.grid(row=2, column=2)
+                    # БЛОКИРУЕМ ПОВТОРНОЕ ОТКРЫТИЕ ОКНА
+                    DATA_CHECK_BUTTON = Button(text="СФОРМИРОВАТЬ ПРИКАЗ", font=("Arial", 8, 'bold'),bg='#79abfc')
+                    DATA_CHECK_BUTTON.grid(row=2, column=2)
 
-        def finish():
-            DATA_CHECK_BUTTON = Button(text="СФОРМИРОВАТЬ ПРИКАЗ", font=("Arial", 8, 'bold'), command=VALIDATION_AND_DATA_GENERATION_FUNCTION, bg='#79abfc')
-            DATA_CHECK_BUTTON.grid(row=2, column=2)
-            window.destroy()
+                    def finish():
+                        DATA_CHECK_BUTTON = Button(text="СФОРМИРОВАТЬ ПРИКАЗ", font=("Arial", 8, 'bold'), command=VALIDATION_AND_DATA_GENERATION_FUNCTION, bg='#79abfc')
+                        DATA_CHECK_BUTTON.grid(row=2, column=2)
+                        window.destroy()
 
-        FUNCTION_SORTING_LISTS_DEBTORS(general_list_of_debtors_second_window, general_list_of_debtors, LIST_OF_EXCLUDED_DEBTORS_NUMBERS)
+                    FUNCTION_SORTING_LISTS_DEBTORS(general_list_of_debtors_second_window, general_list_of_debtors, LIST_OF_EXCLUDED_DEBTORS_NUMBERS)
 
-        DATA_VERIFICATION_LABEL = Label(window, text="ПРОВЕРЬТЕ ВВЕДЕННЫЕ ДАННЫЕ:", font=("Arial", 10,'bold'))
-        DATA_VERIFICATION_LABEL.grid(row=0, column=0, columnspan=4, padx=10)
+                    DATA_VERIFICATION_LABEL = Label(window, text="ПРОВЕРЬТЕ ВВЕДЕННЫЕ ДАННЫЕ:", font=("Arial", 10,'bold'))
+                    DATA_VERIFICATION_LABEL.grid(row=0, column=0, columnspan=4, padx=10)
 
-        DEBTORS_ADDRESS_VERIFICATION_LABEL = Label(window, text=f"Адрес должника(-ов): ул. {BOX_HOUSE.get()} "
-                                                                f"д. {BOX_NUMBER.get()} кв. {APARTMENT_NUMBER_LABEL.get()}", font=("Arial", 10, 'bold'))
-        DEBTORS_ADDRESS_VERIFICATION_LABEL.grid(row=1, column=0, sticky=W, padx=10)
+                    DEBTORS_ADDRESS_VERIFICATION_LABEL = Label(window, text=f"Адрес должника(-ов): ул. {BOX_HOUSE.get()} "
+                                                                            f"д. {BOX_NUMBER.get()} кв. {APARTMENT_NUMBER_LABEL.get()}", font=("Arial", 10, 'bold'))
+                    DEBTORS_ADDRESS_VERIFICATION_LABEL.grid(row=1, column=0, sticky=W, padx=10)
 
-        AMOUNT_OWED_LABEL = Label(window, text="Сумма задолженности: " + DEBTOR_DEBT_LABEL.get(), font=("Arial", 10, 'bold'))
-        AMOUNT_OWED_LABEL.grid(row=2, column=0, sticky=W, padx=10)
+                    AMOUNT_OWED_LABEL = Label(window, text="Сумма задолженности: " + DEBTOR_DEBT_LABEL.get(), font=("Arial", 10, 'bold'))
+                    AMOUNT_OWED_LABEL.grid(row=2, column=0, sticky=W, padx=10)
 
-        WITHDRAWAL_OF_STATE_DUTY_LABEL = Label(window, text="Сумма гос.пошлины: " + result_of_the_fee_calculation.get(),
-                                               font=("Arial", 10, 'bold'))
-        WITHDRAWAL_OF_STATE_DUTY_LABEL.grid(row=3, column=0, sticky=W, padx=10)
+                    WITHDRAWAL_OF_STATE_DUTY_LABEL = Label(window, text="Сумма гос.пошлины: " + result_of_the_fee_calculation.get(),
+                                                           font=("Arial", 10, 'bold'))
+                    WITHDRAWAL_OF_STATE_DUTY_LABEL.grid(row=3, column=0, sticky=W, padx=10)
 
-        DISPLAY_TOTAL_DEBT_LABEL = Label(window, text="Общая сумма задолженности: " + total_debt.get(), font=("Arial", 10, 'bold'))
-        DISPLAY_TOTAL_DEBT_LABEL.grid(row=4, column=0, sticky=W, padx=10)
+                    DISPLAY_TOTAL_DEBT_LABEL = Label(window, text="Общая сумма задолженности: " + total_debt.get(), font=("Arial", 10, 'bold'))
+                    DISPLAY_TOTAL_DEBT_LABEL.grid(row=4, column=0, sticky=W, padx=10)
 
-        DISPLAYING_THE_PERIOD_OF_DEBTS_LABEL = Label(window, text=f'Период задолженности: c {BEGINNING_OF_PERIOD.get()} г. по {END_OF_PERIOD.get()} г.', font=("Arial", 10, 'bold'))
-        DISPLAYING_THE_PERIOD_OF_DEBTS_LABEL.grid(row=5, column=0, sticky=W, padx=10)
+                    DISPLAYING_THE_PERIOD_OF_DEBTS_LABEL = Label(window, text=f'Период задолженности: c {BEGINNING_OF_PERIOD.get()} г. по {END_OF_PERIOD.get()} г.', font=("Arial", 10, 'bold'))
+                    DISPLAYING_THE_PERIOD_OF_DEBTS_LABEL.grid(row=5, column=0, sticky=W, padx=10)
 
-        NULL_BLOCK1_LABEL = Label(window, text="")
-        NULL_BLOCK1_LABEL.grid(row=6, column=0, sticky=W, padx=10)
+                    NULL_BLOCK1_LABEL = Label(window, text="")
+                    NULL_BLOCK1_LABEL.grid(row=6, column=0, sticky=W, padx=10)
 
-        DISPLAY_OF_DEBTORS_LABEL = Label(window, text="ДОЛЖНИКИ", font=("Arial", 10, 'bold'))
-        DISPLAY_OF_DEBTORS_LABEL.grid(row=7, column=0, columnspan=4, padx=10)
+                    DISPLAY_OF_DEBTORS_LABEL = Label(window, text="ДОЛЖНИКИ", font=("Arial", 10, 'bold'))
+                    DISPLAY_OF_DEBTORS_LABEL.grid(row=7, column=0, columnspan=4, padx=10)
 
-        counter_t = 0
-        for i in FIRST_LIST_OF_DEBTORS_EXCEPT_EXCLUDED:
-            # CREATING A STRING WITHOUT ADDITIONAL CHARACTERS
-            v_x = i[1:]
-            vv_x = ''
-            for j in v_x:
-                vv_x += j + ' '
-            OUTPUT_TABLE_LABEL = Label(window, text=vv_x, font=("Arial", 10))
-            OUTPUT_TABLE_LABEL.grid(row=8 + counter_t, column=0, sticky=W, padx=10, columnspan=4)
-            counter_t += 1
+                    counter_t = 0
+                    for i in FIRST_LIST_OF_DEBTORS_EXCEPT_EXCLUDED:
+                        # CREATING A STRING WITHOUT ADDITIONAL CHARACTERS
+                        v_x = i[1:]
+                        vv_x = ''
+                        for j in v_x:
+                            vv_x += j + ' '
+                        OUTPUT_TABLE_LABEL = Label(window, text=vv_x, font=("Arial", 10))
+                        OUTPUT_TABLE_LABEL.grid(row=8 + counter_t, column=0, sticky=W, padx=10, columnspan=4)
+                        counter_t += 1
 
-        def save_file():
-            filepath = filedialog.askdirectory()
-            NAME_OF_THE_SAVE_ACT_LABEL['text'] = filepath
-            window.attributes('-topmost', True)
-            window.attributes('-topmost', False)
+                    def save_file():
+                        filepath = filedialog.askdirectory()
+                        NAME_OF_THE_SAVE_ACT_LABEL['text'] = filepath
+                        window.attributes('-topmost', True)
+                        window.attributes('-topmost', False)
 
-        NULL_BLOCK2_LABEL_LABEL = Label(window, text="")
-        NULL_BLOCK2_LABEL_LABEL.grid(row=9 + counter_t, column=0, sticky=W, padx=10)
+                    NULL_BLOCK2_LABEL_LABEL = Label(window, text="")
+                    NULL_BLOCK2_LABEL_LABEL.grid(row=9 + counter_t, column=0, sticky=W, padx=10)
 
-        BUTTON_SAVE_AS_LABEL = Button(window, text="Путь сохранения", font=("Arial", 10,'bold'), command=save_file)
-        BUTTON_SAVE_AS_LABEL.grid(row=12 + counter_t, column=0, sticky=W, padx=10)
+                    BUTTON_SAVE_AS_LABEL = Button(window, text="Путь сохранения", font=("Arial", 10,'bold'), command=save_file)
+                    BUTTON_SAVE_AS_LABEL.grid(row=12 + counter_t, column=0, sticky=W, padx=10)
 
-        NAME_OF_THE_SAVE_ACT_LABEL = Label(window, text='')
-        NAME_OF_THE_SAVE_ACT_LABEL.grid(row=13 + counter_t, column=0, sticky=W, padx=10)
+                    NAME_OF_THE_SAVE_ACT_LABEL = Label(window, text='')
+                    NAME_OF_THE_SAVE_ACT_LABEL.grid(row=13 + counter_t, column=0, sticky=W, padx=10)
 
-        TEXT_NAME_DEBTORS_LABEL = Label(window, text="Сохранить файл как: ", font=("Arial", 10, 'bold'))
-        TEXT_NAME_DEBTORS_LABEL.grid(row=10 + counter_t, column=0, sticky=W, padx=10)
+                    TEXT_NAME_DEBTORS_LABEL = Label(window, text="Сохранить файл как: ", font=("Arial", 10, 'bold'))
+                    TEXT_NAME_DEBTORS_LABEL.grid(row=10 + counter_t, column=0, sticky=W, padx=10)
 
-        NAME_DEBTORS_LABEL = Entry(window)
-        NAME_DEBTORS_LABEL.insert(0, f'{VARIABLE_STREET} {VARIABLE_NUMBER}-{APARTMENT_NUMBER_LABEL.get()} {FIRST_LIST_OF_DEBTORS_EXCEPT_EXCLUDED[0][1]} от {date_now.day}.{date_now.month}.{date_now.year} года')
-        NAME_DEBTORS_LABEL.grid(row=11 + counter_t, column=0, sticky=W, padx=10)
+                    NAME_DEBTORS_LABEL = Entry(window)
+                    NAME_DEBTORS_LABEL.insert(0, f'{VARIABLE_STREET} {VARIABLE_NUMBER}-{APARTMENT_NUMBER_LABEL.get()} {FIRST_LIST_OF_DEBTORS_EXCEPT_EXCLUDED[0][1]} от {date_now.day}.{date_now.month}.{date_now.year} года')
+                    NAME_DEBTORS_LABEL.grid(row=11 + counter_t, column=0, sticky=W, padx=10)
 
-        print(FIRST_LIST_OF_DEBTORS_EXCEPT_EXCLUDED)
-        print(general_list_of_debtors_second_window)
-        print(general_list_of_debtors)
-        print(LIST_OF_EXCLUDED_DEBTORS_NUMBERS)
+                    print(f'первая {FIRST_LIST_OF_DEBTORS_EXCEPT_EXCLUDED}')
+                    print(general_list_of_debtors_second_window)
+                    print(general_list_of_debtors)
+                    print(LIST_OF_EXCLUDED_DEBTORS_NUMBERS)
 
-        print(SECOND_LIST_OF_DEBTORS_EXCEPT_EXCLUDED)
+                    print(SECOND_LIST_OF_DEBTORS_EXCEPT_EXCLUDED)
 
-    #FUNCTION OF DATA CONVERSION TO DOC FORMAT AND SAVING OF THE FINISHED DOCUMENT
-        def TEXT_DOCUMENT():
-            # THE FUNCTION OF FORMING FROM THE RECEIVED DATA A STRING WITH \n HYPHENATIONS
-            # FOR TRANSMISSION TO DOC
-            def DOC_DATA_GENERATION_FUNCTION(data):
-                assembly_variable = ''
-                for i in data:
-                    for j in range(len(i)):
-                        if j != 0:
-                            if j == 2:
-                                assembly_variable += i[j] + ' года рождения'
+                #FUNCTION OF DATA CONVERSION TO DOC FORMAT AND SAVING OF THE FINISHED DOCUMENT
+                    def TEXT_DOCUMENT():
+                        # THE FUNCTION OF FORMING FROM THE RECEIVED DATA A STRING WITH \n HYPHENATIONS
+                        # FOR TRANSMISSION TO DOC
+                        def DOC_DATA_GENERATION_FUNCTION(data, data1):
+                            assembly_variable = ''
+                            for i in range(len(data1)):
+                                for j in range(len(data)):
+                                    if data1[i][1] == data[j][1] and data1[i][2] == data[j][2]:
+                                        data[j][3] = data1[i][3]
+                            for i in data:
+                                for j in range(len(i)):
+                                    if j != 0:
+                                        if j == 2:
+                                            assembly_variable += i[j] + ' года рождения'
+                                            assembly_variable += '\n'
+                                        else:
+                                            assembly_variable += i[j]
+                                            assembly_variable += '\n'
                                 assembly_variable += '\n'
+                            return assembly_variable
+
+                        def FUNCTION_OF_COLLECTION_FROM_OWNERS_OF_DEBTORS(data):
+                            assembly_variable = ''
+                            for i in data:
+                                if i[4] == '+':
+                                    assembly_variable += i[1] + ', '
+                            if assembly_variable == '':
+                                return list_of_owner_in_the_absence[0]
                             else:
-                                assembly_variable += i[j]
-                                assembly_variable += '\n'
-                    assembly_variable += '\n'
-                return assembly_variable
+                                return assembly_variable[:len(assembly_variable) - 2]
 
-            def FUNCTION_OF_COLLECTION_FROM_OWNERS_OF_DEBTORS(data):
-                assembly_variable = ''
-                for i in data:
-                    if i[4] == '+':
-                        assembly_variable += i[1] + ', '
-                return assembly_variable[:len(assembly_variable) - 2]
-
-            def FUNCTION_OF_COLLECTION_REGISTERED_DEBTORS(data):
-                assembly_variable = ''
-                for i in data:
-                    if i[5] == '+':
-                        assembly_variable += i[1] + ', '
-                if len(assembly_variable) != 0:
-                    return assembly_variable[:len(assembly_variable) - 2]
-                else:
-                    return assembly_variable
-
-            def FUNCTION_TO_CHECK_REGISTERED_FOR_DOC(data):
-                assembly_variable = ''
-                for i in data:
-                    if i[5] == '+':
-                        assembly_variable += i[1] + ', '
-                if len(assembly_variable) == 0:
-                    return 'никто не состоит'
-                else:
-                    return 'состоят'
-
-            def FUNCTION_TO_CHECK_THE_NUMBER_OF_OBLIGERS_FOR_DOC(data):
-                if len(data) > 1:
-                    return 'в солидарном порядке с следующих должников:'
-                else:
-                    return 'с следующих должников:'
-
-            def LIST_OF_DEBTORS_FUNCTION(data):
-                assembly_variable = ''
-                for i in data:
-                    for j in range(len(i)):
-                        if j != 0 and j != 3:
-                            if j == 2:
-                                assembly_variable += i[j] + ' года рождения'
-                                assembly_variable += ', '
+                        def FUNCTION_OF_COLLECTION_REGISTERED_DEBTORS(data):
+                            assembly_variable = ''
+                            for i in data:
+                                if i[5] == '+':
+                                    assembly_variable += i[1] + ', '
+                            if len(assembly_variable) != 0:
+                                return assembly_variable[:len(assembly_variable) - 2]
                             else:
-                                assembly_variable += i[j] + ' '
-                return assembly_variable
+                                return assembly_variable
 
-            def DEBT_PERIOD_FUNCTION(start, end):
-                text = 'c ' + start + ' г.' + ' по ' + end + ' г.'
-                return text
+                        def FUNCTION_TO_CHECK_REGISTERED_FOR_DOC(data):
+                            assembly_variable = ''
+                            for i in data:
+                                if i[5] == '+':
+                                    assembly_variable += i[1] + ', '
+                            if len(assembly_variable) == 0:
+                                return 'никто не состоит'
+                            else:
+                                return 'состоят'
 
-            doc = DocxTemplate("shablonsydybprik.docx") #DOCUMENT TEMPLATE
+                        def FUNCTION_TO_CHECK_THE_NUMBER_OF_OBLIGERS_FOR_DOC(data):
+                            if len(data) > 1:
+                                return 'в солидарном порядке с следующих должников:'
+                            else:
+                                return 'с следующих должников:'
 
-            context = {'name_of_the_court': JUDICIAL_SECTION_LABEL["text"],  # TRANSFERRING COURT DATA
-                       'claimant': COMPANY_NAME_LABEL["text"],  # TRANSFER OF CLAIMANTS
-                       'address_claimant': COMPANY_ADDRESS_LABEL["text"],  # TRANSFER ADDRESS CLAIMANT
-                       'debtors': DOC_DATA_GENERATION_FUNCTION(FIRST_LIST_OF_DEBTORS_EXCEPT_EXCLUDED), # DEBTORS
-                       'variable_street': VARIABLE_STREET,  # TRANSFER OF THE DEBTOR'S ADDRESS
-                       'variable_number': VARIABLE_NUMBER,  # TRANSFER OF THE HOUSE NUMBER OF THE DEBTOR
-                       'apartment_variable_number': APARTMENT_NUMBER_LABEL.get(),  # TRANSFER OF THE APARTMENT NUMBER OF THE DEBTOR
-                       'amount_debt': DEBTOR_DEBT_LABEL.get(),  # TRANSFER THE AMOUNT OF DEBT
-                       'amount_state_fee': result_of_the_fee_calculation.get(),  # TRANSFER STATE DUTY
-                       'owners_of_debtors': FUNCTION_OF_COLLECTION_FROM_OWNERS_OF_DEBTORS(SECOND_LIST_OF_DEBTORS_EXCEPT_EXCLUDED), # DEBTORS IN LIST FORMAT
-                       'check': FUNCTION_TO_CHECK_REGISTERED_FOR_DOC(SECOND_LIST_OF_DEBTORS_EXCEPT_EXCLUDED),
-                       # FORMATION OF THE TEXT DEPENDING ON WHETHER THE REGISTERED DEBTORS
-                       'registered_debtors': FUNCTION_OF_COLLECTION_REGISTERED_DEBTORS(SECOND_LIST_OF_DEBTORS_EXCEPT_EXCLUDED), # LIST OF REGISTERED
-                       'management_start': MANAGEMENT_START_DATE_LABEL["text"],  # TRANSFER THE STARTING DATE OF MANAGEMENT
-                       'debt_period': DEBT_PERIOD_FUNCTION(BEGINNING_OF_PERIOD.get(), END_OF_PERIOD.get()), # DEBT PERIOD
-                       'total_debt': total_debt.get(),  # TRANSFER TOTAL DEBT
-                       'check_quantity': FUNCTION_TO_CHECK_THE_NUMBER_OF_OBLIGERS_FOR_DOC(SECOND_LIST_OF_DEBTORS_EXCEPT_EXCLUDED),
-                       # FORMATION OF THE TEXT DEPENDING ON THE NUMBER OF DEBTORS
-                       'list_of_debtors': LIST_OF_DEBTORS_FUNCTION(FIRST_LIST_OF_DEBTORS_EXCEPT_EXCLUDED), # LIST OF DEBTORS
-                       }
+                        def LIST_OF_DEBTORS_FUNCTION(data, data1):
+                            assembly_variable = ''
+                            for i in range(len(data1)):
+                                for j in range(len(data)):
+                                    if data1[i][1] == data[j][1] and data1[i][2] == data[j][2]:
+                                        data[j][3] = data1[i][3]
+                            for i in data:
+                                z = 0
+                                for j in range(len(i)):
+                                    if j != 0:
+                                        if j == 2:
+                                            assembly_variable += i[j] + ' года рождения'
+                                            assembly_variable += ' '
+                                        else:
+                                            assembly_variable += i[j]
+                                            if z == 0:
+                                                assembly_variable += ' '
+                                                z += 1
+                                if i != data[len(data) - 1]:
+                                    assembly_variable += ', '
+                            return assembly_variable
 
-            save_folder_path = NAME_OF_THE_SAVE_ACT_LABEL['text'] # COMPUTER SAVE PATH VARIABLE
-            save_name = NAME_DEBTORS_LABEL.get() # VARIABLE ADDRESS AND APARTMENTS OF THE DEBTOR FOR TEXT FORMAT
-            doc.render(context) # GENERATION OF ALL DATA
-            doc.save(f"{save_folder_path}/{save_name}.docx") # TRANSFER AND SAVING DATA
-            showinfo(title="Информация", message=f'Судебный приказ создан!')
-            finish()
+                        def DEBT_PERIOD_FUNCTION(start, end):
+                            text = 'c ' + start + ' г.' + ' по ' + end + ' г.'
+                            return text
 
-        # BUTTON FOR SENDING GENERATED DATA TO THE FUNCTION OF AUTOMATIC GENERATION AND SAVING DATA
-        SENDING_FILES_TO_A_DOC_LABEL = Button(window, text="ОТПРАВИТЬ", font=("Arial", 10,'bold'), command=TEXT_DOCUMENT, bg='#79abfc')
-        SENDING_FILES_TO_A_DOC_LABEL.grid(row=14 + counter_t, column=0, sticky=W, padx=10)
+                        doc = DocxTemplate("shablonsydybprik.docx") #DOCUMENT TEMPLATE
 
-        window.protocol("WM_DELETE_WINDOW", finish)
+                        context = {'name_of_the_court': JUDICIAL_SECTION_LABEL["text"],  # TRANSFERRING COURT DATA
+                                   'claimant': COMPANY_NAME_LABEL["text"],  # TRANSFER OF CLAIMANTS
+                                   'address_claimant': COMPANY_ADDRESS_LABEL["text"],  # TRANSFER ADDRESS CLAIMANT
+                                   'debtors': DOC_DATA_GENERATION_FUNCTION(FIRST_LIST_OF_DEBTORS_EXCEPT_EXCLUDED, list_with_legal_representative), # DEBTORS
+                                   'variable_street': VARIABLE_STREET,  # TRANSFER OF THE DEBTOR'S ADDRESS
+                                   'variable_number': VARIABLE_NUMBER,  # TRANSFER OF THE HOUSE NUMBER OF THE DEBTOR
+                                   'apartment_variable_number': APARTMENT_NUMBER_LABEL.get(),  # TRANSFER OF THE APARTMENT NUMBER OF THE DEBTOR
+                                   'amount_debt': DEBTOR_DEBT_LABEL.get(),  # TRANSFER THE AMOUNT OF DEBT
+                                   'amount_state_fee': result_of_the_fee_calculation.get(),  # TRANSFER STATE DUTY
+                                   'owners_of_debtors': FUNCTION_OF_COLLECTION_FROM_OWNERS_OF_DEBTORS(SECOND_LIST_OF_DEBTORS_EXCEPT_EXCLUDED), # DEBTORS IN LIST FORMAT
+                                   'check': FUNCTION_TO_CHECK_REGISTERED_FOR_DOC(SECOND_LIST_OF_DEBTORS_EXCEPT_EXCLUDED),
+                                   # FORMATION OF THE TEXT DEPENDING ON WHETHER THE REGISTERED DEBTORS
+                                   'registered_debtors': FUNCTION_OF_COLLECTION_REGISTERED_DEBTORS(SECOND_LIST_OF_DEBTORS_EXCEPT_EXCLUDED), # LIST OF REGISTERED
+                                   'management_start': MANAGEMENT_START_DATE_LABEL["text"],  # TRANSFER THE STARTING DATE OF MANAGEMENT
+                                   'debt_period': DEBT_PERIOD_FUNCTION(BEGINNING_OF_PERIOD.get(), END_OF_PERIOD.get()), # DEBT PERIOD
+                                   'total_debt': total_debt.get(),  # TRANSFER TOTAL DEBT
+                                   'check_quantity': FUNCTION_TO_CHECK_THE_NUMBER_OF_OBLIGERS_FOR_DOC(SECOND_LIST_OF_DEBTORS_EXCEPT_EXCLUDED),
+                                   # FORMATION OF THE TEXT DEPENDING ON THE NUMBER OF DEBTORS
+                                   'list_of_debtors': LIST_OF_DEBTORS_FUNCTION(FIRST_LIST_OF_DEBTORS_EXCEPT_EXCLUDED, list_with_legal_representative), # LIST OF DEBTORS
+                                   }
 
-        DATA_CHECK_BUTTON = Button(text="СФОРМИРОВАТЬ ПРИКАЗ", font=("Arial", 8, 'bold'),command=VALIDATION_AND_DATA_GENERATION_FUNCTION, bg='#79abfc')
-        DATA_CHECK_BUTTON.grid(row=2, column=2)
+                        save_folder_path = NAME_OF_THE_SAVE_ACT_LABEL['text'] # COMPUTER SAVE PATH VARIABLE
+                        save_name = NAME_DEBTORS_LABEL.get() # VARIABLE ADDRESS AND APARTMENTS OF THE DEBTOR FOR TEXT FORMAT
+                        doc.render(context) # GENERATION OF ALL DATA
+                        doc.save(f"{save_folder_path}/{save_name}.docx") # TRANSFER AND SAVING DATA
+                        showinfo(title="Информация", message=f'Судебный приказ создан!')
+                        finish()
+
+                    # BUTTON FOR SENDING GENERATED DATA TO THE FUNCTION OF AUTOMATIC GENERATION AND SAVING DATA
+                    SENDING_FILES_TO_A_DOC_LABEL = Button(window, text="ОТПРАВИТЬ", font=("Arial", 10,'bold'), command=TEXT_DOCUMENT, bg='#79abfc')
+                    SENDING_FILES_TO_A_DOC_LABEL.grid(row=14 + counter_t, column=0, sticky=W, padx=10)
+
+                    window.protocol("WM_DELETE_WINDOW", finish)
+
+                    DATA_CHECK_BUTTON = Button(text="СФОРМИРОВАТЬ ПРИКАЗ", font=("Arial", 8, 'bold'),command=VALIDATION_AND_DATA_GENERATION_FUNCTION, bg='#79abfc')
+                    DATA_CHECK_BUTTON.grid(row=2, column=2)
 
 
 # FUNCTION OF ADDING DATA TO THE LIST OF PAYMENT OF THE STATE DUTY
