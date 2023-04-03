@@ -16,13 +16,16 @@ root.geometry("870x750")  # SIZE PROGRAM
 
 
 # LOCATION CONFIGURATION
-for c in range(20): root.columnconfigure(index=c, weight=1)
-for r in range(3): root.rowconfigure(index=r, weight=1)
+for c in range(20):
+    root.columnconfigure(index=c, weight=1)
+for r in range(3):
+    root.rowconfigure(index=r, weight=1)
 
 # GENERAL LIST OF DEBTORS AND DATA ABOUT THEM
 general_list_of_debtors = []
 general_list_of_debtors_second_window = []
 
+# LISTS OF REMOVED DEBTORS
 LIST_OF_EXCLUDED_DEBTORS_NUMBERS = []
 all_del = []
 
@@ -30,16 +33,16 @@ all_del = []
 LIST_OF_THE_REGISTER_OF_THE_STATE_DUTY = []
 LIST_OF_DEBTORS_FOR_THE_COURT = []
 
-####
+# LISTS OF DEBTORS FOR FORMATION OF THE DOCUMENT
 FIRST_LIST_OF_DEBTORS_EXCEPT_EXCLUDED = []
 SECOND_LIST_OF_DEBTORS_EXCEPT_EXCLUDED = []
 
-####
+# LISTS OF RESPONSIBILITIES FOR MINOR DEBTORS AND OWNERS IN THEIR ABSENCE
 list_with_legal_representative = []
 list_of_adults = []
 list_of_owner_in_the_absence = []
 
-#
+
 def WINDOW_FOR_SELECTING_THE_OWNER_IF_THERE_ARE_NO_ONE():
     window_no_owner = ThemedTk(theme="breeze")
     window_no_owner.title("Укажите собственника")
@@ -192,7 +195,7 @@ def AGE_CHECK_FUNCTION(d):
 
 
 
-# Функция проверки введены ли все данные
+# FUNCTION OF VERIFICATION OF COMPLETION OF ALL FIELDS
 
 def CONTROL_FUNCTION():
     def FUNCTION_SORTING_LISTS_DEBTORS(a, b, c):
@@ -255,8 +258,8 @@ def STATE_DUTY_REGISTRY_WINDOW_FUNCTIONS():
     TABLE_PARAMETERS_register.grid(row=0, column=0, sticky="nsew")
 
     # БЛОКИРУЕМ НАЖАТИЕ ПОВТОРНО
-    asasas = Button(text="РЕЕСТР НА ОПЛАТУ \nГОСПОШЛИНЫ", font=("Arial", 8, 'bold'))
-    asasas.grid(row=14, column=2, rowspan=2)
+    BUTTON_REGISTER_FOR_PAYMENT_OF_STATE_DUTIES = Button(text="РЕЕСТР НА ОПЛАТУ \nГОСПОШЛИНЫ", font=("Arial", 8, 'bold'))
+    BUTTON_REGISTER_FOR_PAYMENT_OF_STATE_DUTIES.grid(row=14, column=2, rowspan=2)
 
     ### НАПОЛНЯЕМ ТАБЛИЦУ
     for i in LIST_OF_THE_REGISTER_OF_THE_STATE_DUTY:
@@ -303,9 +306,9 @@ def STATE_DUTY_REGISTRY_WINDOW_FUNCTIONS():
     NULL_BLOCK.grid(column=0, sticky=W, padx=2)
 
     def finish():
-        asasas = Button(text="РЕЕСТР НА ОПЛАТУ \nГОСПОШЛИНЫ", font=("Arial", 8, 'bold'),
+        BUTTON_REGISTER_FOR_PAYMENT_OF_STATE_DUTIES = Button(text="РЕЕСТР НА ОПЛАТУ \nГОСПОШЛИНЫ", font=("Arial", 8, 'bold'),
                         command=STATE_DUTY_REGISTRY_WINDOW_FUNCTIONS)
-        asasas.grid(row=14, column=2, rowspan=2)
+        BUTTON_REGISTER_FOR_PAYMENT_OF_STATE_DUTIES.grid(row=14, column=2, rowspan=2)
         state_duty_register_generation_window.destroy()
 
 
@@ -393,8 +396,8 @@ def REGISTRY_WINDOW_FUNCTION_TO_COURT():
     TABLE_PARAMETERS_register.grid(row=0, column=0, sticky="nsew")
 
     # БЛОКИРУЕМ НАЖАТИЕ ПОВТОРНО
-    asasas1 = Button(text="РЕЕСТР НА ПОДАЧУ \nВ МИРОВОЙ СУД", font=("Arial", 8, 'bold'))
-    asasas1.grid(row=16, column=2, rowspan=2)
+    REGISTRY_BUTTON_FOR_SUBMISSION_TO_THE_COURT = Button(text="РЕЕСТР НА ПОДАЧУ \nВ МИРОВОЙ СУД", font=("Arial", 8, 'bold'))
+    REGISTRY_BUTTON_FOR_SUBMISSION_TO_THE_COURT.grid(row=16, column=2, rowspan=2)
 
     ### НАПОЛНЯЕМ ТАБЛИЦУ
     for i in LIST_OF_DEBTORS_FOR_THE_COURT:
@@ -444,9 +447,9 @@ def REGISTRY_WINDOW_FUNCTION_TO_COURT():
     NULL_BLOCK.grid(column=0, sticky=W, padx=2)
 
     def finish():
-        asasas1 = Button(text="РЕЕСТР НА ПОДАЧУ \nВ МИРОВОЙ СУД", font=("Arial", 8, 'bold'),
+        REGISTRY_BUTTON_FOR_SUBMISSION_TO_THE_COURT = Button(text="РЕЕСТР НА ПОДАЧУ \nВ МИРОВОЙ СУД", font=("Arial", 8, 'bold'),
                          command=REGISTRY_WINDOW_FUNCTION_TO_COURT)
-        asasas1.grid(row=16, column=2, rowspan=2)
+        REGISTRY_BUTTON_FOR_SUBMISSION_TO_THE_COURT.grid(row=16, column=2, rowspan=2)
         window_for_the_formation_of_the_registry_to_the_court.destroy()
 
     def distribution_function_by_management_companies():
@@ -1249,13 +1252,13 @@ BUTTON_PAYMENT_OF_STATE_DUTIES.grid(row=3, column=2, rowspan=2)
 BUTTON_SEND_TO_COURT = Button(text="ДОБАВИТЬ В РЕЕСТР НА \nПОДАЧУ В МИРОВОЙ СУД", font=("Arial", 8,'bold'), bg='#79abfc', command=THE_FUNCTION_OF_FORMING_A_LIST_OF_DEBTORS_FOR_THE_COURT)
 BUTTON_SEND_TO_COURT.grid(row=5, column=2, rowspan=2)
 
-#####
-asasas = Button(text="РЕЕСТР НА ОПЛАТУ \nГОСПОШЛИНЫ", font=("Arial", 8,'bold'), command=STATE_DUTY_REGISTRY_WINDOW_FUNCTIONS)
-asasas.grid(row=14, column=2, rowspan=2)
+# BUTTON RESPONSIBLE FOR OPENING THE REGISTRY FOR PAYING STATE DUTIES
+BUTTON_REGISTER_FOR_PAYMENT_OF_STATE_DUTIES = Button(text="РЕЕСТР НА ОПЛАТУ \nГОСПОШЛИНЫ", font=("Arial", 8,'bold'), command=STATE_DUTY_REGISTRY_WINDOW_FUNCTIONS)
+BUTTON_REGISTER_FOR_PAYMENT_OF_STATE_DUTIES.grid(row=14, column=2, rowspan=2)
 
-#####
-asasas1 = Button(text="РЕЕСТР НА ПОДАЧУ \nВ МИРОВОЙ СУД", font=("Arial", 8,'bold'), command=REGISTRY_WINDOW_FUNCTION_TO_COURT)
-asasas1.grid(row=16, column=2, rowspan=2)
+# BUTTON RESPONSIBLE FOR OPENING REGISTRATION FOR SUBMISSION TO THE COURT
+REGISTRY_BUTTON_FOR_SUBMISSION_TO_THE_COURT = Button(text="РЕЕСТР НА ПОДАЧУ \nВ МИРОВОЙ СУД", font=("Arial", 8,'bold'), command=REGISTRY_WINDOW_FUNCTION_TO_COURT)
+REGISTRY_BUTTON_FOR_SUBMISSION_TO_THE_COURT.grid(row=16, column=2, rowspan=2)
 
 
 root.resizable(False, False)
