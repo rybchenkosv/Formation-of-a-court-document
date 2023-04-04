@@ -115,6 +115,18 @@ def COURT_NUMBER(street,number):
     else:
         return 'ОШИБКА! Не найден судебный участок!'
 
+def COURT_NUMBER_FOR_BAILIFFS(street,number):
+    if street in JUDICIAL_PRECINCT_9:
+        return 'мировым судьей судебного участка №9 в Березовском районе Красноярского края Пашковским А.Д.'
+    elif street == 'Дружбы' and number in JUDICIAL_PRECINCT_9[12][street]:
+        return 'мировым судьей судебного участка №9 в Березовском районе Красноярского края Пашковским А.Д.'
+    elif street in JUDICIAL_PRECINCT_8:
+        return 'мировым судьей судебного участка №8 в Березовском районе Красноярского края Белявцевой Е.А.'
+    elif street == 'Дружбы' and number in JUDICIAL_PRECINCT_8[2][street]:
+        return 'мировым судьей судебного участка №8 в Березовском районе Красноярского края Белявцевой Е.А.'
+    else:
+        return 'ОШИБКА! Не найден судебный участок!'
+
 
 def MANAGEMENT_START_DATE(street,number):
     if street in OOO_CKY_RAZVITYE and number in OOO_CKY_RAZVITYE[street]:

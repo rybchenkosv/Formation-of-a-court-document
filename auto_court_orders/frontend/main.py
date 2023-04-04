@@ -8,7 +8,10 @@ from docxtpl import DocxTemplate
 from ttkthemes import ThemedTk
 from datetime import date
 import datetime
+import sqlite3
 
+con = sqlite3.connect("base_of_debtors.db")
+cursor = con.cursor()
 
 root = ThemedTk(theme="breeze")
 root.title("Формирование судебного приказа в мировой суд")  # THE DISPLAYED NAME OF THE PROGRAM
@@ -759,7 +762,6 @@ def VALIDATION_AND_DATA_GENERATION_FUNCTION():
                 # WE FORM LISTS OF DEBTORS WITHOUT DELETES FOR DISPLAY IN THE CONFIRMATION WINDOW AND SEND TO DOC
                 FIRST_LIST_OF_DEBTORS_EXCEPT_EXCLUDED.clear()
                 SECOND_LIST_OF_DEBTORS_EXCEPT_EXCLUDED.clear()
-                print(list_with_legal_representative)
                 OWNER_SELECTION_FUNCTION(list_for_a_new_debtor)
                 def FUNCTION_SORTING_LISTS_DEBTORS(a, b, c):
                     global SECOND_LIST_OF_DEBTORS_EXCEPT_EXCLUDED, FIRST_LIST_OF_DEBTORS_EXCEPT_EXCLUDED
@@ -858,13 +860,6 @@ def VALIDATION_AND_DATA_GENERATION_FUNCTION():
                     NAME_DEBTORS_LABEL = Entry(window)
                     NAME_DEBTORS_LABEL.insert(0, f'{VARIABLE_STREET} {VARIABLE_NUMBER}-{APARTMENT_NUMBER_LABEL.get()} {FIRST_LIST_OF_DEBTORS_EXCEPT_EXCLUDED[0][1]} от {date_now.day}.{date_now.month}.{date_now.year} года')
                     NAME_DEBTORS_LABEL.grid(row=11 + counter_t, column=0, sticky=W, padx=10)
-
-                    print(f'первая {FIRST_LIST_OF_DEBTORS_EXCEPT_EXCLUDED}')
-                    print(general_list_of_debtors_second_window)
-                    print(general_list_of_debtors)
-                    print(LIST_OF_EXCLUDED_DEBTORS_NUMBERS)
-
-                    print(SECOND_LIST_OF_DEBTORS_EXCEPT_EXCLUDED)
 
                 #FUNCTION OF DATA CONVERSION TO DOC FORMAT AND SAVING OF THE FINISHED DOCUMENT
                     def TEXT_DOCUMENT():
@@ -977,6 +972,32 @@ def VALIDATION_AND_DATA_GENERATION_FUNCTION():
                         save_name = NAME_DEBTORS_LABEL.get() # VARIABLE ADDRESS AND APARTMENTS OF THE DEBTOR FOR TEXT FORMAT
                         doc.render(context) # GENERATION OF ALL DATA
                         doc.save(f"{save_folder_path}/{save_name}.docx") # TRANSFER AND SAVING DATA
+
+                        # ФОРМИРУЕМ ДАННЫЕ ДЛЯ ВНЕСЕНИЯ В SQL
+                        for i in FIRST_LIST_OF_DEBTORS_EXCEPT_EXCLUDED:
+                            if len(FIRST_LIST_OF_DEBTORS_EXCEPT_EXCLUDED) >= 2:
+                                database_data = ('*', i[1], i[2], i[3], f"{BOX_HOUSE.get()}, {BOX_NUMBER.get()}-{APARTMENT_NUMBER_LABEL.get()}",
+                                                 DEBTOR_DEBT_LABEL.get(), result_of_the_fee_calculation.get(), total_debt.get(),
+                                                 f'{BEGINNING_OF_PERIOD.get()} по {END_OF_PERIOD.get()}', COMPANY_NAME_LABEL["text"],
+                                                 f'{date_now.day}.{date_now.month}.{date_now.year}')
+                                cursor.execute(
+                                    "INSERT INTO base_of_debtors (jointly, name, date_of_birth, passport, address, debt_amount, "
+                                    "amount_of_state_duty, total_debt, debt_period, management_company, date_of_creation_writ) "
+                                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                                    database_data)
+                                con.commit()
+                            else:
+                                database_data = (' ', i[1], i[2], i[3], f"{BOX_HOUSE.get()}, {BOX_NUMBER.get()}-{APARTMENT_NUMBER_LABEL.get()}",
+                                                 DEBTOR_DEBT_LABEL.get(), result_of_the_fee_calculation.get(), total_debt.get(),
+                                                 f'{BEGINNING_OF_PERIOD.get()} по {END_OF_PERIOD.get()}', COMPANY_NAME_LABEL["text"],
+                                                 f'{date_now.day}.{date_now.month}.{date_now.year}')
+                                cursor.execute(
+                                    "INSERT INTO base_of_debtors (jointly, name, date_of_birth, passport, address, debt_amount, "
+                                    "amount_of_state_duty, total_debt, debt_period, management_company, date_of_creation_writ) "
+                                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                                    database_data)
+                                con.commit()
+
                         showinfo(title="Информация", message=f'Судебный приказ создан!')
                         finish()
 
