@@ -1,11 +1,25 @@
-from datetime import date
-import datetime
+class Laptop:
 
-a = '22.05.1995'
-a = a.split('.')
-aa = datetime.date(int(a[2]),int(a[1]),int(a[0]))
-bb = datetime.date.today()
-cc = abs(aa-bb)
-dd = (str(cc)).split()[0]
+    def __init__(self, name, processor, hdd, ram, cost):
+        self.name = name
+        self.processor = processor
+        self.hdd = hdd
+        self.ram = ram
+        self.cost = cost
 
-print(dd)
+    def details(self):
+        print('The details of the laptop are:')
+        print('Name         :', self.name)
+        print('Processor    :', self.processor)
+        print('HDD Capacity :', self.hdd)
+        print('RAM          :', self.ram)
+        print('Cost($)      :', self.cost)
+
+
+# create object
+laptop1 = Laptop('Dell Alienware', 'Intel Core i7', 512, 8, 2500.00)
+
+print(laptop1.name)
+print(laptop1.processor)
+
+laptop1.details()
