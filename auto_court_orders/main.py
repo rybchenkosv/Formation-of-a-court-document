@@ -1213,7 +1213,7 @@ TOTAL_DEBT_LABEL = Label(textvariable=total_debt)
 TOTAL_DEBT_LABEL.grid(row=15, column=1, sticky=NS)
 result_of_the_fee_calculation.trace_add("write", FUNCTION_TO_DISPLAY_THE_TOTAL_AMOUNT_OF_DEBT)
 
-# DEBTY PERIOD BLOCK
+#DEBTY PERIOD BLOCK
 ##TEXT PART
 LABEL_DEBT_PERIOD = Label(text="Укажите период задолженности", font=("Arial", 10,'bold'))
 LABEL_DEBT_PERIOD.grid(row=16, column=1, sticky=NS)
